@@ -46,7 +46,7 @@ public class Player : MonoBehaviour
 		spawnPoint.position = this.transform.position;
     }
 
-	private void restart() {
+	public void restart() {
 		this.transform.position = spawnPoint.position;
 	}
 
