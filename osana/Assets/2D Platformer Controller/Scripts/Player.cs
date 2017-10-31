@@ -33,13 +33,22 @@ public class Player : MonoBehaviour
     private bool wallSliding;
     private int wallDirX;
 
+	public Transform deathMarker;
+	private Transform spawnPoint;
+
     private void Start()
     {
         controller = GetComponent<Controller2D>();
         gravity = -(2 * maxJumpHeight) / Mathf.Pow(timeToJumpApex, 2);
         maxJumpVelocity = Mathf.Abs(gravity) * timeToJumpApex;
         minJumpVelocity = Mathf.Sqrt(2 * Mathf.Abs(gravity) * minJumpHeight);
+		spawnPoint = new GameObject ("Spawn Marker").transform;
+		spawnPoint.position = this.transform.position;
     }
+
+	private void restart() {
+		this.transform.position = spawnPoint.position;
+	}
 
     private void Update()
     {
@@ -52,6 +61,13 @@ public class Player : MonoBehaviour
         {
             velocity.y = 0f;
         }
+
+		if (Input.GetKey(KeyCode.R))
+		{
+			restart ();
+		}
+
+		checkForDead ();
     }
 
     public void SetDirectionalInput(Vector2 input)
@@ -139,4 +155,10 @@ public class Player : MonoBehaviour
         velocity.x = Mathf.SmoothDamp(velocity.x, targetVelocityX, ref velocityXSmoothing, (controller.collisions.below ? accelerationTimeGrounded : accelerationTimeAirborne));
         velocity.y += gravity * Time.deltaTime;
     }
+
+	private void checkForDead() {
+		if (this.transform.position.y < deathMarker.position.y) {
+			restart ();
+		}
+	}
 }
