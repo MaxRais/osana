@@ -68,6 +68,7 @@ public class Player : MonoBehaviour
 		}
 
 		checkForDead ();
+		checkForWin ();
     }
 
     public void SetDirectionalInput(Vector2 input)
@@ -158,6 +159,13 @@ public class Player : MonoBehaviour
 
 	private void checkForDead() {
 		if (this.transform.position.y < deathMarker.position.y) {
+			restart ();
+		}
+	}
+
+	private void checkForWin() {
+		Transform winMarker = GameObject.FindGameObjectWithTag ("Finish").transform;
+		if (Vector3.Distance (this.transform.position, winMarker.position) < 5f) {
 			restart ();
 		}
 	}
