@@ -27,6 +27,7 @@ public class FollowPlayer : MonoBehaviour {
 				DisplayMessage.ins.showMessage ("you are being followed");
 				alertedFollow = true;
 			}
+			speed = 3f;
 			this.transform.Translate (new Vector3 (speed * Time.deltaTime, 0, 0));
 		} else {
 			alertedFollow = false;
@@ -34,6 +35,9 @@ public class FollowPlayer : MonoBehaviour {
 
 		if (Vector3.Distance (this.transform.position, player.transform.position) < minDistance) {
 			latched = true;
+			speed = 5f;
+			this.transform.Translate (new Vector3 (speed * Time.deltaTime, 0, 0));
+
 			if (!alertedLatch) {
 				DisplayMessage.ins.showMessage ("white blood cell has latched");
 				alertedLatch = true;

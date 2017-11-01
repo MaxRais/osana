@@ -9,6 +9,7 @@ public class Player : MonoBehaviour
     private float accelerationTimeAirborne = .2f;
     private float accelerationTimeGrounded = .1f;
     private float moveSpeed = 6f;
+	public Sprite osanaLeft, osanaRight;
 
     public Vector2 wallJumpClimb;
     public Vector2 wallJumpOff;
@@ -65,6 +66,13 @@ public class Player : MonoBehaviour
 		if (Input.GetKey(KeyCode.R))
 		{
 			restart ();
+		}
+
+		if (Input.GetKey (KeyCode.A)) {
+			this.gameObject.transform.GetChild (0).GetComponent<SpriteRenderer> ().sprite = osanaLeft;
+		}
+		if (Input.GetKey (KeyCode.D)) {
+			this.gameObject.transform.GetChild (0).GetComponent<SpriteRenderer> ().sprite = osanaRight;
 		}
 
 		checkForDead ();
