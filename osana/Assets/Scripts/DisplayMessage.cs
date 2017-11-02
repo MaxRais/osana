@@ -39,6 +39,10 @@ public class DisplayMessage : MonoBehaviour {
 		}
 	}
 
+	public void clearQueue() {
+		messageQueue.Clear ();
+	}
+
 	private IEnumerator fadeMessage(string text, float duration) {
 		message.text = text;
 		while (message.color.a < 1.0f) {

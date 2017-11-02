@@ -49,6 +49,7 @@ public class Player : MonoBehaviour
 
 	public void restart() {
 		this.transform.position = spawnPoint.position;
+		DisplayMessage.ins.clearQueue ();
 	}
 
     private void Update()
@@ -69,10 +70,10 @@ public class Player : MonoBehaviour
 		}
 
 		if (Input.GetKey (KeyCode.A)) {
-			this.gameObject.transform.GetChild (0).GetComponent<SpriteRenderer> ().sprite = osanaLeft;
+			SetDirectionalInput (Vector2.left);
 		}
 		if (Input.GetKey (KeyCode.D)) {
-			this.gameObject.transform.GetChild (0).GetComponent<SpriteRenderer> ().sprite = osanaRight;
+			SetDirectionalInput (Vector2.right);
 		}
 
 		checkForDead ();
@@ -82,6 +83,11 @@ public class Player : MonoBehaviour
     public void SetDirectionalInput(Vector2 input)
     {
         directionalInput = input;
+		if (input.x == -1) {
+			this.gameObject.transform.GetChild (0).GetComponent<SpriteRenderer> ().sprite = osanaLeft;
+		} else if (input.x == 1) {
+			this.gameObject.transform.GetChild (0).GetComponent<SpriteRenderer> ().sprite = osanaRight;
+		}
     }
 
     public void OnJumpInputDown()
