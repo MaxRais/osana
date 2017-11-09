@@ -17,6 +17,7 @@ public class Player : MonoBehaviour
 
     public bool canDoubleJump;
     private bool isDoubleJumping = false;
+	private bool facingRight = true;
 
     public float wallSlideSpeedMax = 3f;
     public float wallStickTime = .25f;
@@ -37,6 +38,12 @@ public class Player : MonoBehaviour
 	public Transform deathMarker;
 	private Transform spawnPoint;
 
+	public float aimSensitivity;
+	private float aimHeight;
+	public float bulletSpeed;
+	public GameObject bulletPrefab;
+	public int health;
+
     private void Start()
     {
         controller = GetComponent<Controller2D>();
@@ -48,6 +55,7 @@ public class Player : MonoBehaviour
     }
 
 	public void restart() {
+		this.health = 3;
 		this.transform.position = spawnPoint.position;
 		DisplayMessage.ins.clearQueue ();
 	}
@@ -85,8 +93,14 @@ public class Player : MonoBehaviour
         directionalInput = input;
 		if (input.x == -1) {
 			this.gameObject.transform.GetChild (0).GetComponent<SpriteRenderer> ().sprite = osanaLeft;
+			facingRight = false;
 		} else if (input.x == 1) {
 			this.gameObject.transform.GetChild (0).GetComponent<SpriteRenderer> ().sprite = osanaRight;
+			facingRight = true;
+		} else if (input.y == 1) {
+			Debug.Log ("Up");
+		} else if (input.y == -1) {
+			Debug.Log ("down");
 		}
     }
 
@@ -131,6 +145,17 @@ public class Player : MonoBehaviour
         }
     }
 
+	public void ShootProjectile()
+	{
+		GameObject bullet = Instantiate (bulletPrefab) as GameObject;
+		bullet.transform.position = this.transform.position;
+		Bullet script = bullet.AddComponent<Bullet> ();
+		script.speed = bulletSpeed;
+		script.direction = facingRight ? 1 : -1;
+		bullet.transform.position += Vector3.right * script.direction;
+		script.source = this.gameObject;
+	}
+
     private void HandleWallSliding()
     {
         wallDirX = (controller.collisions.left) ? -1 : 1;
@@ -173,6 +198,8 @@ public class Player : MonoBehaviour
 
 	private void checkForDead() {
 		if (this.transform.position.y < deathMarker.position.y) {
+			restart ();
+		} else if (this.health <= 0) {
 			restart ();
 		}
 	}
