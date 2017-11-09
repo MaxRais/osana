@@ -5,7 +5,7 @@ public class Player : MonoBehaviour
 {
     public float maxJumpHeight = 4f;
     public float minJumpHeight = 1f;
-    public float timeToJumpApex = .4f;
+    public float timeToJumpApex = .35f;
     private float accelerationTimeAirborne = .2f;
     private float accelerationTimeGrounded = .1f;
     private float moveSpeed = 6f;

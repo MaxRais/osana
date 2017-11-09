@@ -5,8 +5,8 @@ using UnityEngine;
 public class FollowPlayer : MonoBehaviour {
 	public GameObject player; 
 	public float speed = 3f;
-	public float maxDistance = 10f;
-	public float minDistance = 1.5f;
+	public float maxDistance = 13f;
+	public float minDistance = 2f;
 
 	private bool alertedFollow = false;
 	private bool alertedLatch = false;
@@ -35,7 +35,7 @@ public class FollowPlayer : MonoBehaviour {
 
 		if (Vector3.Distance (this.transform.position, player.transform.position) < minDistance) {
 			latched = true;
-			speed = 5f;
+			speed = 6f;
 			this.transform.Translate (new Vector3 (speed * Time.deltaTime, 0, 0));
 
 			if (!alertedLatch) {

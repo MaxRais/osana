@@ -25,7 +25,7 @@ public class PlayerInput : MonoBehaviour
             player.OnJumpInputUp();
         }
 
-		if (Input.GetKeyDown (KeyCode.X))
+		if (Input.GetKeyDown (KeyCode.Mouse0) || Input.GetKeyDown (KeyCode.X) )
 		{
 			player.ShootProjectile ();
 		}
