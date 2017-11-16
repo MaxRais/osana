@@ -24,7 +24,7 @@ public class FollowPlayer : MonoBehaviour {
 		transform.Rotate(new Vector3(0,-90,0),Space.Self);
 		if (Vector3.Distance (this.transform.position, player.transform.position) > 1f && Vector3.Distance (this.transform.position, player.transform.position) < maxDistance) {
 			if (!alertedFollow) {
-				DisplayMessage.ins.showMessage ("you are being followed");
+				//DisplayMessage.ins.showMessage ("you are being followed");
 				alertedFollow = true;
 			}
 			speed = 3f;
@@ -39,7 +39,7 @@ public class FollowPlayer : MonoBehaviour {
 			this.transform.Translate (new Vector3 (speed * Time.deltaTime, 0, 0));
 
 			if (!alertedLatch) {
-				DisplayMessage.ins.showMessage ("white blood cell has latched");
+				//DisplayMessage.ins.showMessage ("white blood cell has latched");
 				alertedLatch = true;
 			}
 		} else {

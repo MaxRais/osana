@@ -8,6 +8,7 @@ public class DisplayMessage : MonoBehaviour {
 	public static DisplayMessage ins;
 
 	public float fadeTime = 5f;
+	public float messageTimeToLive = 2f;
 	private Text message;
 	private bool showing;
 
@@ -57,8 +58,11 @@ public class DisplayMessage : MonoBehaviour {
 		}
 		message.text = "";
 		showing = false;
-		if (messageQueue.Count > 0) {
+		while (messageQueue.Count > 0) {
 			Message message = messageQueue.Dequeue ();
+			if (message.waitTime > messageTimeToLive) {
+				continue;
+			}
 			showMessage (message.text, message.duration);
 		}
 	}
@@ -70,16 +74,20 @@ public class DisplayMessage : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-		
+		foreach (Message message in messageQueue) {
+			message.waitTime += Time.deltaTime;
+		}
 	}
 }
 		
 public class Message {
 	public string text { get; private set; }
 	public float duration { get; private set; }
+	public float waitTime;
 
 	public Message(string text, float duration) {
 		this.text = text;
 		this.duration = duration;
+		this.waitTime = 0f;
 	}
 }
