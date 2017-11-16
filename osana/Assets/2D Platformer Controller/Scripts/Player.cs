@@ -18,6 +18,7 @@ public class Player : MonoBehaviour
     public bool canDoubleJump;
     private bool isDoubleJumping = false;
 	private bool facingRight = true;
+	private float xScale;
 
     public float wallSlideSpeedMax = 3f;
     public float wallStickTime = .25f;
@@ -30,6 +31,7 @@ public class Player : MonoBehaviour
     private float velocityXSmoothing;
 
     private Controller2D controller;
+	private Animator animator;
 
     private Vector2 directionalInput;
     private bool wallSliding;
@@ -47,6 +49,7 @@ public class Player : MonoBehaviour
     private void Start()
     {
         controller = GetComponent<Controller2D>();
+		animator = this.gameObject.transform.GetChild (0).GetComponent<Animator> ();
         gravity = -(2 * maxJumpHeight) / Mathf.Pow(timeToJumpApex, 2);
         maxJumpVelocity = Mathf.Abs(gravity) * timeToJumpApex;
         minJumpVelocity = Mathf.Sqrt(2 * Mathf.Abs(gravity) * minJumpHeight);
@@ -70,6 +73,10 @@ public class Player : MonoBehaviour
         if (controller.collisions.above || controller.collisions.below)
         {
             velocity.y = 0f;
+
+			if (controller.collisions.below) {
+				animator.SetBool ("jumping", false);
+			}
         }
 
 		if (Input.GetKey(KeyCode.R))
@@ -92,20 +99,32 @@ public class Player : MonoBehaviour
     {
         directionalInput = input;
 		if (input.x == -1) {
-			this.gameObject.transform.GetChild (0).GetComponent<SpriteRenderer> ().sprite = osanaLeft;
+			//this.gameObject.transform.GetChild (0).GetComponent<SpriteRenderer> ().sprite = osanaLeft;
 			facingRight = false;
+			if (controller.collisions.below) {
+				animator.SetInteger ("xDir", -1);
+			}
+			this.transform.localScale = new Vector3 (-1, 1, 1);
 		} else if (input.x == 1) {
-			this.gameObject.transform.GetChild (0).GetComponent<SpriteRenderer> ().sprite = osanaRight;
+			//this.gameObject.transform.GetChild (0).GetComponent<SpriteRenderer> ().sprite = osanaRight;
 			facingRight = true;
+			if (controller.collisions.below) {
+				animator.SetInteger ("xDir", 1);
+			}
+			this.transform.localScale = Vector3.one;
 		} else if (input.y == 1) {
 			Debug.Log ("Up");
 		} else if (input.y == -1) {
 			Debug.Log ("down");
+		} else if (input.x == 0) {
+			animator.SetInteger ("xDir", 0);
 		}
     }
 
     public void OnJumpInputDown()
     {
+		animator.SetInteger ("xDir", 0);
+		animator.SetBool ("jumping", true);
         if (wallSliding)
         {
             if (wallDirX == directionalInput.x)
@@ -134,6 +153,8 @@ public class Player : MonoBehaviour
         {
             velocity.y = maxJumpVelocity;
             isDoubleJumping = true;
+			animator.SetBool ("jumping", false);
+			animator.SetBool ("jumping", true);
         }
     }
 
