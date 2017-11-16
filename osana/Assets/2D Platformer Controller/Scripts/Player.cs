@@ -8,7 +8,7 @@ public class Player : MonoBehaviour
     public float timeToJumpApex = .35f;
     private float accelerationTimeAirborne = .2f;
     private float accelerationTimeGrounded = .1f;
-    private float moveSpeed = 6f;
+    public float moveSpeed = 6f;
 	public Sprite osanaLeft, osanaRight;
 
     public Vector2 wallJumpClimb;
