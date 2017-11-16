@@ -1,4 +1,4 @@
-﻿﻿using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -18,7 +18,6 @@ public class BoneRotate : MonoBehaviour {
 			float zRotation = this.transform.rotation.eulerAngles.z;
 			if(zRotation > 180)
 				zRotation -= 360;
-			Debug.Log (zRotation);
 			if (goingUp) {
 				if (zRotation > lowerBound) {
 					this.transform.Rotate (Vector3.forward * speed * -Time.deltaTime);
