@@ -14,8 +14,10 @@ public class CameraZoom : MonoBehaviour {
 	private bool zoomingIn = false;
 	private bool zoomingOut = false;
 	private bool stopZoom = false;
+	private bool firstZoom = true;
 
 	private Camera cam;
+	public string levelName;
 
 	// Use this for initialization
 	void Start () {
@@ -45,6 +47,10 @@ public class CameraZoom : MonoBehaviour {
 		currentZoomSpeed = zoomSpeed;
 		levelStarted = true;
 		zoomingIn = false;
+		if (firstZoom) {
+			DisplayMessage.ins.showMessage ("Welcome to " + levelName);
+			firstZoom = false;
+		}
 	}
 
 	private IEnumerator zoomOut() {
