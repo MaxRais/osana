@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class BoneRotate : MonoBehaviour {
 	public float upperBound, lowerBound, pauseTime, speed;
-	public bool goingUp, pausing;
+	public bool goingCW, pausing;
 	private float pauseSecs;
 	// Use this for initialization
 	void Start () {
@@ -18,19 +18,19 @@ public class BoneRotate : MonoBehaviour {
 			float zRotation = this.transform.rotation.eulerAngles.z;
 			if(zRotation > 180)
 				zRotation -= 360;
-			if (goingUp) {
+			if (goingCW) {
 				if (zRotation > lowerBound) {
 					this.transform.Rotate (Vector3.forward * speed * -Time.deltaTime);
 				} else if (zRotation <= lowerBound) {
 					pausing = true;
-					goingUp = false;
+					goingCW = false;
 				}
 			} else {
 				if (zRotation < upperBound) {
 					this.transform.Rotate (Vector3.forward * speed * Time.deltaTime);
 				} else if (zRotation >= upperBound) {
 					pausing = true;
-					goingUp = true;
+					goingCW = true;
 				}
 			}
 		} else {

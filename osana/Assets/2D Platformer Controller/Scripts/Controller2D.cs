@@ -3,8 +3,8 @@
 public class Controller2D : RaycastController
 {
     public float fallingThroughPlatformResetTimer = 0.1f;
-    private float maxClimbAngle = 80f;
-    private float maxDescendAngle = 80f;
+    public float maxClimbAngle = 80f;
+    public float maxDescendAngle = 80f;
 
     public CollisionInfo collisions;
     [HideInInspector]
@@ -45,7 +45,6 @@ public class Controller2D : RaycastController
         {
             VerticalCollisions(ref moveAmount);
         }
-
         transform.Translate(moveAmount);
 
         if (standingOnPlatform)
@@ -157,6 +156,14 @@ public class Controller2D : RaycastController
                     }
                 }
             }
+			if (slopeAngle > 30) {
+				this.GetComponent<Rigidbody2D> ().gravityScale = 1;
+			}
+			if (slopeAngle < 30 || !collisions.below) {
+				this.GetComponent<Rigidbody2D> ().gravityScale = 0;
+				this.GetComponent<Rigidbody2D> ().velocity.Set (0, 0);
+			}
+
         }
     }
 
