@@ -39,7 +39,7 @@ public class Player : MonoBehaviour
     private int wallDirX;
 
 	public Transform deathMarker;
-	private Transform spawnPoint;
+	public Transform spawnPoint;
 
 	public float aimSensitivity;
 	private float aimHeight;
@@ -54,7 +54,7 @@ public class Player : MonoBehaviour
         gravity = -(2 * maxJumpHeight) / Mathf.Pow(timeToJumpApex, 2);
         maxJumpVelocity = Mathf.Abs(gravity) * timeToJumpApex;
         minJumpVelocity = Mathf.Sqrt(2 * Mathf.Abs(gravity) * minJumpHeight);
-		spawnPoint = new GameObject ("Spawn Marker").transform;
+		//spawnPoint = GameObject.Find("SpawnMarker").transform;
 		spawnPoint.position = this.transform.position;
     }
 

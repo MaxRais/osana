@@ -19,8 +19,10 @@ public class Disease : MonoBehaviour {
 		if(name.Contains("Player")) {
 			GameObject player = GameObject.Find (name);
 			player.GetComponent<Player> ().health--;
-			player.GetComponent<Player> ().pushBack (3f);
-			StartCoroutine (flashRed (player.GetComponentInChildren<SpriteRenderer> (), 3));
+			if (player.GetComponent<Player> ().health > 0){
+				player.GetComponent<Player> ().pushBack (3f);
+				StartCoroutine (flashRed (player.GetComponentInChildren<SpriteRenderer> (), 3));
+			}
 		}
 	}
 
