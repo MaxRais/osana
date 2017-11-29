@@ -6,7 +6,7 @@ public class Enemy : MonoBehaviour {
 
 	public float range;
 	public float speed;
-	private float center;
+	private float traveled;
 	private int direction;
 	public float detectDistance;
 	public GameObject player;
@@ -14,18 +14,31 @@ public class Enemy : MonoBehaviour {
 	public float bulletSpeed;
 	public GameObject bulletPrefab;
 	private bool shot;
+	public float sizeOffset = 5f;
+	public bool snapDown = true;
 
 	// Use this for initialization
 	void Start () {
-		center = this.transform.position.x;
+		traveled = 0;
 		direction = 1;
 		shot = false;
+
+
+		// Snap enemy to platform they are on
+		RaycastHit2D hit = Physics2D.Raycast(transform.position, (snapDown ? Vector2.down : Vector2.up), 25f, ~(1 << 10));
+		if (hit.collider != null && hit.collider.tag == "Obstacle") { 
+			transform.position = hit.point + (hit.normal * sizeOffset);
+			transform.rotation = Quaternion.FromToRotation (transform.up, hit.normal) * transform.rotation;
+			transform.SetParent (hit.transform);
+		}
 	}
 	
 	// Update is called once per frame
 	void Update () {
-		this.transform.position += Vector3.right * speed * Time.deltaTime * direction;
-		if (this.transform.position.x <= center - range || this.transform.position.x >= center + range) {
+		traveled += Vector3.Distance (transform.position, transform.position + transform.right * speed * Time.deltaTime * direction);
+		this.transform.position += transform.right * speed * Time.deltaTime * direction;
+		if (traveled >= range) {
+			traveled = 0;
 			shot = false;
 			direction *= -1;
 		}
@@ -36,6 +49,22 @@ public class Enemy : MonoBehaviour {
 		if (Vector3.Distance (this.transform.position, player.transform.position) <= detectDistance &&
 			Mathf.Sign(direction) == Mathf.Sign(player.transform.position.x - this.transform.position.x)) {
 			shootProjectile ();
+		}
+	}
+
+	void FixedUpdate() {
+		RaycastHit2D hit = Physics2D.Raycast(transform.position + new Vector3((snapDown ? 1 : -1) * direction, 0, 0),
+			(snapDown ? Vector2.down : Vector2.up), 10f, ~(1 << 10));
+		if (hit.collider == null) {	
+			traveled = 0;
+			shot = false;
+			direction *= -1;
+		} else if (hit.collider != null && hit.collider.tag == "Obstacle" && hit.transform != this.transform.parent) {
+			Debug.Log ("Corner");
+			transform.parent = null;
+			transform.position = hit.point + (hit.normal * sizeOffset);
+			transform.rotation = Quaternion.FromToRotation (transform.up, hit.normal) * transform.rotation;
+			transform.SetParent (hit.transform);
 		}
 	}
 
