@@ -171,10 +171,26 @@ public class Player : MonoBehaviour
 	{
 		GameObject bullet = Instantiate (bulletPrefab) as GameObject;
 		bullet.transform.position = this.transform.position;
+		Vector2 dir = new Vector2 (0f, 0f);
+		if (directionalInput.x < 0 && directionalInput.y > 0)
+			dir.Set (-0.5f, 0.3f);
+		if (directionalInput.x > 0 && directionalInput.y > 0)
+			dir.Set (0.5f, 0.3f);
+		if (directionalInput.x < 0 && directionalInput.y < 0)
+			dir.Set (-0.5f, -0.3f);
+		if (directionalInput.x > 0 && directionalInput.y < 0)
+			dir.Set (0.5f, -0.3f);
+		if (directionalInput.x == 0 && directionalInput.y > 0)
+			dir.Set (0, 1);
+		if (directionalInput.x == 0 && directionalInput.y < 0)
+			dir.Set (0, -1);
+		bullet.transform.rotation = Quaternion.FromToRotation ((facingRight ? transform.right : -transform.right), dir) 
+			* bullet.transform.rotation;
+		
 		Bullet script = bullet.AddComponent<Bullet> ();
 		script.speed = bulletSpeed;
 		script.direction = facingRight ? 1 : -1;
-		bullet.transform.position += Vector3.right * script.direction;
+		//bullet.transform.position += transform.right * script.direction;
 		script.source = this.gameObject;
 	}
 
