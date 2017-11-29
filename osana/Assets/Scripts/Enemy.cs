@@ -24,7 +24,7 @@ public class Enemy : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-		this.transform.position += Vector3.right * speed * Time.deltaTime * direction;
+		this.transform.position += transform.right * speed * Time.deltaTime * direction;
 		if (this.transform.position.x <= center - range || this.transform.position.x >= center + range) {
 			shot = false;
 			direction *= -1;
