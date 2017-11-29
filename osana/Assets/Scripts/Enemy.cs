@@ -6,7 +6,7 @@ public class Enemy : MonoBehaviour {
 
 	public float range;
 	public float speed;
-	private float center;
+	private float traveled;
 	private int direction;
 	public float detectDistance;
 	public GameObject player;
@@ -17,15 +17,18 @@ public class Enemy : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
-		center = this.transform.position.x;
+		traveled = 0;
 		direction = 1;
 		shot = false;
 	}
 	
 	// Update is called once per frame
 	void Update () {
+		traveled += Vector3.Distance (transform.position, transform.position + transform.right * speed * Time.deltaTime * direction);
+		Debug.Log (traveled);
 		this.transform.position += transform.right * speed * Time.deltaTime * direction;
-		if (this.transform.position.x <= center - range || this.transform.position.x >= center + range) {
+		if (traveled >= range) {
+			traveled = 0;
 			shot = false;
 			direction *= -1;
 		}
@@ -36,6 +39,15 @@ public class Enemy : MonoBehaviour {
 		if (Vector3.Distance (this.transform.position, player.transform.position) <= detectDistance &&
 			Mathf.Sign(direction) == Mathf.Sign(player.transform.position.x - this.transform.position.x)) {
 			shootProjectile ();
+		}
+	}
+
+	void FixedUpdate() {
+		RaycastHit2D hit = Physics2D.Raycast(transform.position + new Vector3(direction * 3, 0, 0), -transform.up, 5f, ~(1 << 10));
+		if (hit.collider == null) {	
+			traveled = 0;
+			shot = false;
+			direction *= -1;
 		}
 	}
 
