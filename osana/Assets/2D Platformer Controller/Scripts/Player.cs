@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using System.Collections;
 
 [RequireComponent(typeof(Controller2D))]
 public class Player : MonoBehaviour
@@ -229,6 +230,31 @@ public class Player : MonoBehaviour
 		Transform winMarker = GameObject.FindGameObjectWithTag ("Finish").transform;
 		if (Vector3.Distance (this.transform.position, winMarker.position) < 5f) {
 			restart ();
+		}
+	}
+
+	public void pushBack(float distance) {
+		StartCoroutine (push (distance));
+	}	
+
+	IEnumerator push(float distance) {
+		float curX = transform.position.x;
+		float startX = curX;
+		float endX = curX + distance * (facingRight ? -1 : 1);
+		float speed = .5f;
+
+		if (facingRight) {
+			while (curX >= endX) {
+				transform.position += Vector3.left * speed;
+				curX = transform.position.x;
+				yield return new WaitForEndOfFrame ();
+			}
+		} else {
+			while (curX <= endX) {
+				transform.position += Vector3.right * speed;
+				curX = transform.position.x;
+				yield return new WaitForEndOfFrame ();
+			}
 		}
 	}
 }
