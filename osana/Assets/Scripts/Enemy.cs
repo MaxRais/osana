@@ -60,12 +60,16 @@ public class Enemy : MonoBehaviour {
 			shot = false;
 			direction *= -1;
 		} else if (hit.collider != null && hit.collider.tag == "Obstacle" && hit.transform != this.transform.parent) {
-			Debug.Log ("Corner");
 			transform.parent = null;
 			transform.position = hit.point + (hit.normal * sizeOffset);
 			transform.rotation = Quaternion.FromToRotation (transform.up, hit.normal) * transform.rotation;
 			transform.SetParent (hit.transform);
 		}
+	}
+
+	public void TakeDamage(int amt, Vector2 dir) {
+		this.health -= amt;
+		this.GetComponent<Rigidbody2D> ().AddForce (new Vector2 (amt, amt) + dir);
 	}
 
 	public void shootProjectile() {

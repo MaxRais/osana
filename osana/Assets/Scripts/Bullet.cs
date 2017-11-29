@@ -22,17 +22,19 @@ public class Bullet : MonoBehaviour {
 		}
 	}
 
-	void OnCollisionEnter2D(Collision2D c) {
-		string name = c.collider.name;
-		if(name.Contains("Player")) {
-			GameObject.Find (name).GetComponent<Player> ().health--;
-		} else if(name.Contains("Nanobot")) {
-			GameObject.Find (name).GetComponent<Enemy> ().health--;
-			GameObject.Find (name).GetComponent<Enemy> ().GetComponent<Rigidbody2D>().AddForce(Vector3.right * direction * 200f);
-			GameObject.Find (name).GetComponent<Enemy> ().GetComponent<Rigidbody2D>().AddForce(Vector3.up * 20f);
+	void OnTriggerEnter2D(Collider2D c) {
+		if (c.gameObject != source) {
+			if (c.gameObject.GetComponentInChildren<Player>()) {
+				Debug.Log ("player");
+				c.gameObject.GetComponent<Player> ().TakeDamage(2, transform.right);
+			} else if (c.gameObject.GetComponentInChildren<Enemy>()) {
+				Debug.Log ("enemy");
+				c.gameObject.GetComponent<Enemy> ().health--;
+				c.gameObject.GetComponent<Enemy> ().GetComponent<Rigidbody2D> ().AddForce (Vector3.right * direction * 200f);
+				c.gameObject.GetComponent<Enemy> ().GetComponent<Rigidbody2D> ().AddForce (Vector3.up * 20f);
 
+			}
+			Destroy (this.gameObject);
 		}
-
-		Destroy (this.gameObject);
 	}
 }

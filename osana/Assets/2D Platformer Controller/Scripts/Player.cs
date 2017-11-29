@@ -96,6 +96,11 @@ public class Player : MonoBehaviour
 		checkForWin ();
     }
 
+	public void TakeDamage(int amt, Vector2 dir) {
+		this.health -= amt;
+		this.GetComponent<Rigidbody2D> ().AddForce (new Vector2 (amt / 2, amt / 2) + dir);
+	}
+
     public void SetDirectionalInput(Vector2 input)
     {
         directionalInput = input;
@@ -190,7 +195,7 @@ public class Player : MonoBehaviour
 		Bullet script = bullet.AddComponent<Bullet> ();
 		script.speed = bulletSpeed;
 		script.direction = facingRight ? 1 : -1;
-		//bullet.transform.position += transform.right * script.direction;
+		bullet.transform.position += new Vector3(dir.x * 1.5f, dir.y * 1.5f, 0);
 		script.source = this.gameObject;
 	}
 
