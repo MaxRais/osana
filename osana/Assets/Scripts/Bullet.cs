@@ -10,6 +10,8 @@ public class Bullet : MonoBehaviour {
 	private Vector3 startPos;
 	public float destroyDistance = 20f;
 	private Vector3 mousePos;
+	public int damage = 1;
+
 	// Use this for initialization
 	void Start () {
 		mousePos = Input.mousePosition;
@@ -27,9 +29,9 @@ public class Bullet : MonoBehaviour {
 	void OnTriggerEnter2D(Collider2D c) {
 		if (!source || c.gameObject.layer != source.layer) {
 			if (c.gameObject.GetComponent<Player>()) {
-				c.gameObject.GetComponent<Player> ().TakeDamage(2, transform.right * direction);
+				c.gameObject.GetComponent<Player> ().TakeDamage(damage, transform.right * direction);
 			} else if (c.gameObject.GetComponent<Enemy>()) {
-				c.gameObject.GetComponent<Enemy> ().TakeDamage (1, transform.right * direction);
+				c.gameObject.GetComponent<Enemy> ().TakeDamage (damage, transform.right * direction);
 			}
 			Destroy (this.gameObject);
 		}

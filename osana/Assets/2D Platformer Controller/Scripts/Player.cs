@@ -50,11 +50,13 @@ public class Player : MonoBehaviour
 	public float dashCooldownTimer;
 	private bool dashCooldown;
 	private float dashTimer;
+	private GameObject recharge;
     private void Start()
     {
 		dashCooldownTimer = 1f;
 		dashCooldown = false;
 		dashTimer = 0;
+		recharge = GameObject.Find ("RechargeBar");
         controller = GetComponent<Controller2D>();
 		animator = this.gameObject.transform.GetChild (0).GetComponent<Animator> ();
         gravity = -(2 * maxJumpHeight) / Mathf.Pow(timeToJumpApex, 2);
@@ -76,10 +78,13 @@ public class Player : MonoBehaviour
         HandleWallSliding();
 
 		if (dashCooldown) {
+			recharge.GetComponent<SpriteRenderer> ().enabled = true;
 			dashTimer += Time.deltaTime;
+			recharge.transform.localScale = new Vector3 (1 - (dashTimer / dashCooldownTimer) + 0.3f, 0.25f, 0.35f);
 			if (dashTimer >= dashCooldownTimer) {
 				dashTimer = 0;
 				dashCooldown = false;
+				recharge.GetComponent<SpriteRenderer> ().enabled = false;
 			}
 		}
 		controller.Move (velocity * Time.deltaTime, directionalInput);
@@ -110,7 +115,21 @@ public class Player : MonoBehaviour
 
 	public void TakeDamage(int amt, Vector2 dir) {
 		this.health -= amt;
-		this.GetComponent<Rigidbody2D> ().AddForce (new Vector2 (amt / 2, amt / 2) + dir + Vector2.up * 2);
+		dir.x *= amt * 20f;
+		dir.y += amt + 10f;
+		this.velocity = dir * amt;
+		StartCoroutine (Blink (amt));
+	}
+
+	IEnumerator Blink(int amt) {
+		for (int i = 0; i < amt * 2; i++) {
+			if (i % 2 == 0)
+				this.GetComponentInChildren<SpriteRenderer> ().color = Color.red;
+			else
+				this.GetComponentInChildren<SpriteRenderer> ().color = Color.white;
+			yield return new WaitForSeconds (0.3f/((float)amt));
+		}
+
 	}
 
     public void SetDirectionalInput(Vector2 input)
