@@ -98,7 +98,7 @@ public class Player : MonoBehaviour
 
 	public void TakeDamage(int amt, Vector2 dir) {
 		this.health -= amt;
-		this.GetComponent<Rigidbody2D> ().AddForce (new Vector2 (amt / 2, amt / 2) + dir);
+		this.GetComponent<Rigidbody2D> ().AddForce (new Vector2 (amt / 2, amt / 2) + dir + Vector2.up * 2);
 	}
 
     public void SetDirectionalInput(Vector2 input)

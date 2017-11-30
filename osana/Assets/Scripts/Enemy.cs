@@ -69,7 +69,17 @@ public class Enemy : MonoBehaviour {
 
 	public void TakeDamage(int amt, Vector2 dir) {
 		this.health -= amt;
-		this.GetComponent<Rigidbody2D> ().AddForce (new Vector2 (amt, amt) + dir);
+		Rigidbody2D rb = this.GetComponent<Rigidbody2D> ();
+		rb.gravityScale = 1;
+		dir.y = 5f;
+		rb.AddForce (dir * amt * 10f);
+		StartCoroutine (HitPause ());
+	}
+
+	IEnumerator HitPause() {
+		yield return new WaitForSeconds(0.75f);
+		this.GetComponent<Rigidbody2D> ().gravityScale = 0;
+		this.GetComponent<Rigidbody2D> ().velocity = new Vector2 (0, 0);
 	}
 
 	public void shootProjectile() {

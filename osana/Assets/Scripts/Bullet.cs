@@ -29,9 +29,7 @@ public class Bullet : MonoBehaviour {
 				c.gameObject.GetComponent<Player> ().TakeDamage(2, transform.right);
 			} else if (c.gameObject.GetComponentInChildren<Enemy>()) {
 				Debug.Log ("enemy");
-				c.gameObject.GetComponent<Enemy> ().health--;
-				c.gameObject.GetComponent<Enemy> ().GetComponent<Rigidbody2D> ().AddForce (Vector3.right * direction * 200f);
-				c.gameObject.GetComponent<Enemy> ().GetComponent<Rigidbody2D> ().AddForce (Vector3.up * 20f);
+				c.gameObject.GetComponent<Enemy> ().TakeDamage (1, transform.right);
 
 			}
 			Destroy (this.gameObject);
