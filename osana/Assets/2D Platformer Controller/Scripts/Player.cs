@@ -119,9 +119,9 @@ public class Player : MonoBehaviour
 			}
 			this.transform.localScale = Vector3.one;
 		} else if (input.y == 1) {
-			Debug.Log ("Up");
+			//Debug.Log ("Up");
 		} else if (input.y == -1) {
-			Debug.Log ("down");
+			//Debug.Log ("down");
 		} else if (input.x == 0) {
 			animator.SetInteger ("xDir", 0);
 		}
