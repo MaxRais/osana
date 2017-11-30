@@ -29,5 +29,13 @@ public class PlayerInput : MonoBehaviour
 		{
 			player.ShootProjectile ();
 		}
+		if (Input.GetKeyDown (KeyCode.Mouse1) || Input.GetKeyDown (KeyCode.C) )
+		{
+			player.Dash ();
+		}
+		if (Input.GetKey (KeyCode.LeftShift) )
+		{
+			player.SetDirectionalInput (Vector2.zero);
+		}
     }
 }

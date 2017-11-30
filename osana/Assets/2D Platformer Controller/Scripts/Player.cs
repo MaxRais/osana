@@ -10,6 +10,7 @@ public class Player : MonoBehaviour
     private float accelerationTimeAirborne = .2f;
     private float accelerationTimeGrounded = .1f;
     public float moveSpeed = 6f;
+	public float dashSpeed = 20f;
 	public Sprite osanaLeft, osanaRight;
 
     public Vector2 wallJumpClimb;
@@ -46,9 +47,14 @@ public class Player : MonoBehaviour
 	public float bulletSpeed;
 	public GameObject bulletPrefab;
 	public int health;
-
+	public float dashCooldownTimer;
+	private bool dashCooldown;
+	private float dashTimer;
     private void Start()
     {
+		dashCooldownTimer = 1f;
+		dashCooldown = false;
+		dashTimer = 0;
         controller = GetComponent<Controller2D>();
 		animator = this.gameObject.transform.GetChild (0).GetComponent<Animator> ();
         gravity = -(2 * maxJumpHeight) / Mathf.Pow(timeToJumpApex, 2);
@@ -65,12 +71,18 @@ public class Player : MonoBehaviour
 	}
 
     private void Update()
-    {
+	{
         CalculateVelocity();
         HandleWallSliding();
 
-        controller.Move(velocity * Time.deltaTime, directionalInput);
-
+		if (dashCooldown) {
+			dashTimer += Time.deltaTime;
+			if (dashTimer >= dashCooldownTimer) {
+				dashTimer = 0;
+				dashCooldown = false;
+			}
+		}
+		controller.Move (velocity * Time.deltaTime, directionalInput);
         if (controller.collisions.above || controller.collisions.below)
         {
             velocity.y = 0f;
@@ -172,6 +184,13 @@ public class Player : MonoBehaviour
         }
     }
 
+	public void Dash() {
+		if (!dashCooldown) {
+			this.SetDirectionalInput (new Vector2 (directionalInput.x * dashSpeed, directionalInput.y));
+			dashCooldown = true;
+		}
+	}
+
 	public void ShootProjectile()
 	{
 		GameObject bullet = Instantiate (bulletPrefab) as GameObject;
@@ -235,6 +254,8 @@ public class Player : MonoBehaviour
     private void CalculateVelocity()
     {
         float targetVelocityX = directionalInput.x * moveSpeed;
+		if (velocity.x < 0 && directionalInput.x > 0 || velocity.x > 0 && directionalInput.x < 0)
+			velocity.x = 0;
         velocity.x = Mathf.SmoothDamp(velocity.x, targetVelocityX, ref velocityXSmoothing, (controller.collisions.below ? accelerationTimeGrounded : accelerationTimeAirborne));
         velocity.y += gravity * Time.deltaTime;
     }

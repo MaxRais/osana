@@ -17,8 +17,10 @@ public class Enemy : MonoBehaviour {
 	public float sizeOffset = 5f;
 	public bool snapDown = true;
 	public float dmgBounceback = 20f;
+	public float bounciness = 15f;
+	public float shotDelay = 3f;
 	private float maxHealth;
-
+	private float shotTimer;
 	// Use this for initialization
 	void Start () {
 		maxHealth = health;
@@ -40,11 +42,15 @@ public class Enemy : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
+		shotTimer += Time.deltaTime;
+		if (shotTimer >= shotDelay) {
+			shotTimer = 0;
+			shot = false;
+		}
 		traveled += Vector3.Distance (transform.position, transform.position + transform.right * speed * Time.deltaTime * direction);
 		this.transform.position += transform.right * speed * Time.deltaTime * direction;
 		if (traveled >= range) {
 			traveled = 0;
-			shot = false;
 			direction *= -1;
 		}
 		if (health <= 0) {
@@ -61,7 +67,6 @@ public class Enemy : MonoBehaviour {
 		RaycastHit2D hit = Physics2D.Raycast(transform.position + transform.right * direction, (snapDown ? Vector2.down : Vector2.up), 2.8f, ~(1 << 10));
 		if (hit.collider == null) {	
 			traveled = 0;
-			shot = false;
 			direction *= -1;
 		} else if (hit.collider != null && hit.collider.tag == "Obstacle" && hit.transform != this.transform.parent) {
 			transform.parent = null;
@@ -76,7 +81,7 @@ public class Enemy : MonoBehaviour {
 			Rigidbody2D rb = this.GetComponent<Rigidbody2D> ();
 			if (col.relativeVelocity.y > 10) {
 				rb.velocity = Vector2.zero;
-				rb.AddForce (Vector2.up * col.relativeVelocity.y);
+				rb.AddForce (Vector2.up * col.relativeVelocity.y * bounciness);
 			} else if (col.relativeVelocity.y < 10) {
 				rb.gravityScale = 0;
 				rb.velocity = new Vector2 (0, 0);
