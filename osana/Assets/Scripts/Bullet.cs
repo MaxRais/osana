@@ -7,32 +7,31 @@ public class Bullet : MonoBehaviour {
 	public float speed;
 	public int direction; // 1 or -1
 	public GameObject source;
+	private Vector3 startPos;
 	public float destroyDistance = 20f;
 	private Vector3 mousePos;
 	// Use this for initialization
 	void Start () {
 		mousePos = Input.mousePosition;
+		startPos = source.transform.position;
 	}
 	
 	// Update is called once per frame
 	void Update () {
-		this.transform.position += Vector3.right * speed * Time.deltaTime * direction;
-		if (Vector3.Distance (this.transform.position, source.transform.position) > destroyDistance && this.gameObject != null) {
+		this.transform.position += transform.right * speed * Time.deltaTime * direction;
+		if (Vector3.Distance (this.transform.position, startPos) > destroyDistance && this.gameObject != null) {
 			Destroy (this.gameObject);
 		}
 	}
 
-	void OnCollisionEnter2D(Collision2D c) {
-		string name = c.collider.name;
-		if(name.Contains("Player")) {
-			GameObject.Find (name).GetComponent<Player> ().health--;
-		} else if(name.Contains("Nanobot")) {
-			GameObject.Find (name).GetComponent<Enemy> ().health--;
-			GameObject.Find (name).GetComponent<Enemy> ().GetComponent<Rigidbody2D>().AddForce(Vector3.right * direction * 200f);
-			GameObject.Find (name).GetComponent<Enemy> ().GetComponent<Rigidbody2D>().AddForce(Vector3.up * 20f);
-
+	void OnTriggerEnter2D(Collider2D c) {
+		if (!source || c.gameObject.layer != source.layer) {
+			if (c.gameObject.GetComponent<Player>()) {
+				c.gameObject.GetComponent<Player> ().TakeDamage(2, transform.right * direction);
+			} else if (c.gameObject.GetComponent<Enemy>()) {
+				c.gameObject.GetComponent<Enemy> ().TakeDamage (1, transform.right * direction);
+			}
+			Destroy (this.gameObject);
 		}
-
-		Destroy (this.gameObject);
 	}
 }

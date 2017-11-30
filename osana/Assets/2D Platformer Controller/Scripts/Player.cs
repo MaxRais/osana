@@ -96,6 +96,11 @@ public class Player : MonoBehaviour
 		checkForWin ();
     }
 
+	public void TakeDamage(int amt, Vector2 dir) {
+		this.health -= amt;
+		this.GetComponent<Rigidbody2D> ().AddForce (new Vector2 (amt / 2, amt / 2) + dir + Vector2.up * 2);
+	}
+
     public void SetDirectionalInput(Vector2 input)
     {
         directionalInput = input;
@@ -114,9 +119,9 @@ public class Player : MonoBehaviour
 			}
 			this.transform.localScale = Vector3.one;
 		} else if (input.y == 1) {
-			Debug.Log ("Up");
+			//Debug.Log ("Up");
 		} else if (input.y == -1) {
-			Debug.Log ("down");
+			//Debug.Log ("down");
 		} else if (input.x == 0) {
 			animator.SetInteger ("xDir", 0);
 		}
@@ -171,10 +176,26 @@ public class Player : MonoBehaviour
 	{
 		GameObject bullet = Instantiate (bulletPrefab) as GameObject;
 		bullet.transform.position = this.transform.position;
-		Bullet script = bullet.AddComponent<Bullet> ();
+		Vector2 dir = new Vector2 (0f, 0f);
+		if (directionalInput.x < 0 && directionalInput.y > 0)
+			dir.Set (-0.5f, 0.3f);
+		if (directionalInput.x > 0 && directionalInput.y > 0)
+			dir.Set (0.5f, 0.3f);
+		if (directionalInput.x < 0 && directionalInput.y < 0)
+			dir.Set (-0.5f, -0.3f);
+		if (directionalInput.x > 0 && directionalInput.y < 0)
+			dir.Set (0.5f, -0.3f);
+		if (directionalInput.x == 0 && directionalInput.y > 0)
+			dir.Set (0, 1);
+		if (directionalInput.x == 0 && directionalInput.y < 0)
+			dir.Set (0, -1);
+		bullet.transform.rotation = Quaternion.FromToRotation ((facingRight ? transform.right : -transform.right), dir) 
+			* bullet.transform.rotation;
+		
+		Bullet script = bullet.GetComponent<Bullet> ();
 		script.speed = bulletSpeed;
 		script.direction = facingRight ? 1 : -1;
-		bullet.transform.position += Vector3.right * script.direction;
+		bullet.transform.position += new Vector3(dir.x * 1.5f, dir.y * 1.5f, 0);
 		script.source = this.gameObject;
 	}
 
