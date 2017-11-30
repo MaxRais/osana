@@ -192,7 +192,7 @@ public class Player : MonoBehaviour
 		bullet.transform.rotation = Quaternion.FromToRotation ((facingRight ? transform.right : -transform.right), dir) 
 			* bullet.transform.rotation;
 		
-		Bullet script = bullet.AddComponent<Bullet> ();
+		Bullet script = bullet.GetComponent<Bullet> ();
 		script.speed = bulletSpeed;
 		script.direction = facingRight ? 1 : -1;
 		bullet.transform.position += new Vector3(dir.x * 1.5f, dir.y * 1.5f, 0);
