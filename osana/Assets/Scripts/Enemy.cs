@@ -19,6 +19,7 @@ public class Enemy : MonoBehaviour {
 	public float dmgBounceback = 20f;
 	public float bounciness = 15f;
 	public float shotDelay = 3f;
+	public int bumpDamage = 1;
 	private float maxHealth;
 	private float shotTimer;
 	// Use this for initialization
@@ -88,7 +89,12 @@ public class Enemy : MonoBehaviour {
 				transform.parent = null;
 				transform.rotation = Quaternion.FromToRotation (transform.up, (snapDown ? col.transform.up : -col.transform.up)) * transform.rotation;
 				transform.SetParent (col.transform);
+				rb.constraints = RigidbodyConstraints2D.FreezePositionX | RigidbodyConstraints2D.FreezeRotation;
 			}
+		}
+		if (col.gameObject.tag == "Player") {
+			Vector2 bumpDir = (col.transform.position - transform.position).normalized;
+			col.gameObject.GetComponent<Player> ().TakeDamage (bumpDamage, bumpDir);
 		}
 	}
 	void OnCollisionExit2D(Collision2D col) {
@@ -105,25 +111,38 @@ public class Enemy : MonoBehaviour {
 		if (snapDown) {
 			rb.gravityScale = 1;
 			dir.x *= dmgBounceback;
-			dir.y = 5 * dmgBounceback;
-			rb.AddForce (dir * amt);
+			dir.y = 1.2f * dmgBounceback;
+			rb.constraints = RigidbodyConstraints2D.FreezeRotation;
+			rb.velocity = (dir * amt);
 		} else {
 			if (this.health / maxHealth <= 0.5) {
 				rb.gravityScale = 1;
+				rb.velocity = Vector2.zero;
 				snapDown = true;
 			}
 		}
-		StartCoroutine (HitPause ());
+		StartCoroutine (Blink (amt));
+	}
+
+	IEnumerator Blink(int amt) {
+		for (int i = 0; i < amt * 2; i++) {
+			if (i % 2 == 0)
+				this.GetComponentInChildren<SpriteRenderer> ().color = Color.red;
+			else
+				this.GetComponentInChildren<SpriteRenderer> ().color = Color.white;
+			yield return new WaitForSeconds (0.1f/((float)amt));
+		}
+
 	}
 
 	IEnumerator HitPause() {
 		yield return new WaitForSeconds(0.75f);
 	}
 
-	public void shootProjectile() {
+	public void shootProjectile () {
 		if (shot)
 			return;
-		
+		Debug.Log (this.name + " firing");
 		GameObject bullet = Instantiate (bulletPrefab) as GameObject;
 		Bullet script = bullet.GetComponent<Bullet> ();
 		script.speed = bulletSpeed;

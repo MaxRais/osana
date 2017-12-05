@@ -18,20 +18,7 @@ public class Disease : MonoBehaviour {
 		string name = c.collider.name;
 		if(name.Contains("Player")) {
 			GameObject player = GameObject.Find (name);
-			player.GetComponent<Player> ().health--;
-			if (player.GetComponent<Player> ().health > 0){
-				player.GetComponent<Player> ().pushBack (3f);
-				StartCoroutine (flashRed (player.GetComponentInChildren<SpriteRenderer> (), 3));
-			}
-		}
-	}
-
-	IEnumerator flashRed(SpriteRenderer sr, int times) {
-		for (int i = 0; i < times; i++) {
-			sr.color = Color.red;
-			yield return new WaitForSeconds (.15f);
-			sr.color = Color.white;
-			yield return new WaitForSeconds (.15f);
+			player.GetComponent<Player> ().TakeDamage(1,(c.transform.position - transform.position).normalized);
 		}
 	}
 }

@@ -156,13 +156,6 @@ public class Controller2D : RaycastController
                     }
                 }
             }
-			if (slopeAngle > 30) {
-				this.GetComponent<Rigidbody2D> ().gravityScale = 1;
-			}
-			if (slopeAngle < 30 || !collisions.below) {
-				this.GetComponent<Rigidbody2D> ().gravityScale = 0;
-				this.GetComponent<Rigidbody2D> ().velocity.Set (0, 0);
-			}
 
         }
     }
