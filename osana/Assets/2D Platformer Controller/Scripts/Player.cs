@@ -51,11 +51,8 @@ public class Player : MonoBehaviour
 	public float dashCooldownTimer;
 	private bool dashCooldown;
 	private float dashTimer;
-<<<<<<< HEAD
 	private GameObject recharge;
-=======
 
->>>>>>> master
     private void Start()
     {
 		dashCooldownTimer = 1f;
