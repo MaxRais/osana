@@ -47,10 +47,15 @@ public class Player : MonoBehaviour
 	public float bulletSpeed;
 	public GameObject bulletPrefab;
 	public int health;
+	private int startHealth;
 	public float dashCooldownTimer;
 	private bool dashCooldown;
 	private float dashTimer;
+<<<<<<< HEAD
 	private GameObject recharge;
+=======
+
+>>>>>>> master
     private void Start()
     {
 		dashCooldownTimer = 1f;
@@ -64,10 +69,11 @@ public class Player : MonoBehaviour
         minJumpVelocity = Mathf.Sqrt(2 * Mathf.Abs(gravity) * minJumpHeight);
 		//spawnPoint = GameObject.Find("SpawnMarker").transform;
 		spawnPoint.position = this.transform.position;
+		startHealth = health;
     }
 
 	public void restart() {
-		this.health = 3;
+		this.health = startHealth;
 		this.transform.position = spawnPoint.position;
 		DisplayMessage.ins.clearQueue ();
 	}

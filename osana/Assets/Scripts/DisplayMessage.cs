@@ -74,8 +74,10 @@ public class DisplayMessage : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-		foreach (Message message in messageQueue) {
-			message.waitTime += Time.deltaTime;
+		if (messageQueue != null) {
+			foreach (Message message in messageQueue) {
+				message.waitTime += Time.deltaTime;
+			}
 		}
 	}
 }
