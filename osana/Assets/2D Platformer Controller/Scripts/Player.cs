@@ -77,6 +77,14 @@ public class Player : MonoBehaviour
         CalculateVelocity();
         HandleWallSliding();
 
+		RaycastHit2D hit = Physics2D.Raycast(transform.position, -Vector3.up, 2f, ~(1 << 8));
+		if (hit.collider != null) {
+			float distanceToGround = hit.distance;
+			if (distanceToGround < 1.23f)
+				transform.Translate (new Vector3 (0, 1.23f - distanceToGround));
+		}
+
+
 		if (dashCooldown) {
 			recharge.GetComponent<SpriteRenderer> ().enabled = true;
 			dashTimer += Time.deltaTime;
@@ -90,7 +98,7 @@ public class Player : MonoBehaviour
 		controller.Move (velocity * Time.deltaTime, directionalInput);
         if (controller.collisions.above || controller.collisions.below)
         {
-            velocity.y = 0f;
+            //velocity.y = 0f;
 
 			if (controller.collisions.below) {
 				animator.SetBool ("jumping", false);
@@ -115,21 +123,34 @@ public class Player : MonoBehaviour
 
 	public void TakeDamage(int amt, Vector2 dir) {
 		this.health -= amt;
-		dir.x *= amt * 20f;
-		dir.y += amt + 10f;
-		this.velocity = dir * amt;
+		ApplyPush (amt, dir);
 		StartCoroutine (Blink (amt));
+	}
+
+	void ApplyPush(int amt, Vector2 dir) {
+		Rigidbody2D rb = this.GetComponent<Rigidbody2D> ();
+		rb.constraints = RigidbodyConstraints2D.FreezeRotation;
+		dir.y += 1f;
+		rb.velocity = (dir * amt * 10f);
+	}
+
+	void OnCollisionEnter2D(Collision2D c) {
+		if (c.gameObject.tag == "Obstacle") {
+			Rigidbody2D rb = this.GetComponent<Rigidbody2D> ();
+			rb.constraints = (RigidbodyConstraints2D.FreezeRotation | RigidbodyConstraints2D.FreezePositionY);
+			rb.velocity = new Vector2(0,0);
+		}
 	}
 
 	IEnumerator Blink(int amt) {
 		for (int i = 0; i < amt * 2; i++) {
+			this.directionalInput.x = 0;
 			if (i % 2 == 0)
 				this.GetComponentInChildren<SpriteRenderer> ().color = Color.red;
 			else
 				this.GetComponentInChildren<SpriteRenderer> ().color = Color.white;
-			yield return new WaitForSeconds (0.3f/((float)amt));
+			yield return new WaitForSeconds (0.1f/((float)amt));
 		}
-
 	}
 
     public void SetDirectionalInput(Vector2 input)
@@ -205,7 +226,7 @@ public class Player : MonoBehaviour
 
 	public void Dash() {
 		if (!dashCooldown) {
-			this.SetDirectionalInput (new Vector2 (directionalInput.x * dashSpeed, directionalInput.y));
+			this.SetDirectionalInput (new Vector2 (dashSpeed * (facingRight ? 1 : -1), directionalInput.y));
 			dashCooldown = true;
 		}
 	}
@@ -291,31 +312,6 @@ public class Player : MonoBehaviour
 		Transform winMarker = GameObject.FindGameObjectWithTag ("Finish").transform;
 		if (Vector3.Distance (this.transform.position, winMarker.position) < 5f) {
 			restart ();
-		}
-	}
-
-	public void pushBack(float distance) {
-		StartCoroutine (push (distance));
-	}	
-
-	IEnumerator push(float distance) {
-		float curX = transform.position.x;
-		float startX = curX;
-		float endX = curX + distance * (facingRight ? -1 : 1);
-		float speed = .5f;
-
-		if (facingRight) {
-			while (curX >= endX) {
-				transform.position += Vector3.left * speed;
-				curX = transform.position.x;
-				yield return new WaitForEndOfFrame ();
-			}
-		} else {
-			while (curX <= endX) {
-				transform.position += Vector3.right * speed;
-				curX = transform.position.x;
-				yield return new WaitForEndOfFrame ();
-			}
 		}
 	}
 }

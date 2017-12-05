@@ -10,6 +10,7 @@ public class MovingPlatform : MonoBehaviour {
 	public float speed = 1f;
 	public float stopSecs = 0;
 	private bool up, right, moving;
+	private GameObject passenger;
 	// Use this for initialization
 	void Start () {
 		up = true;
@@ -17,12 +18,26 @@ public class MovingPlatform : MonoBehaviour {
 		moving = true;
 		startPos = transform.position;
 	}
-	
+
+	void OnCollisionEnter2D(Collision2D c) {
+		if (c.gameObject.tag == "Player") {
+			passenger = c.gameObject;
+		}
+	}
+	void OnCollisionExit2D(Collision2D c) {
+		if (c.gameObject.tag == "Player") {
+			if(c.rigidbody.velocity.y > 0)
+				passenger = null;
+		}
+	}
+
 	// Update is called once per frame
 	void Update () {
 		if (moving) {
 			if (right && Mathf.Abs (transform.position.x - startPos.x) < horizontalMovement) {
 				transform.Translate (new Vector3 (speed * Time.deltaTime, 0, 0));
+				if(passenger)
+					passenger.transform.Translate (new Vector3 (speed * Time.deltaTime, 0, 0));
 				if (Mathf.Abs (transform.position.x - startPos.x) >= horizontalMovement) {
 					right = false;
 					if(horizontalMovement > verticalMovement)
@@ -31,6 +46,8 @@ public class MovingPlatform : MonoBehaviour {
 			}
 			if (!right && Mathf.Abs (transform.position.x - startPos.x) >= 0) {
 				transform.Translate (new Vector3 (-speed * Time.deltaTime, 0, 0));
+				if(passenger)
+					passenger.transform.Translate (new Vector3 (-speed * Time.deltaTime, 0, 0));
 				if (transform.position.x - startPos.x <= 0) {
 					right = true;
 					if(horizontalMovement > verticalMovement)
@@ -39,6 +56,8 @@ public class MovingPlatform : MonoBehaviour {
 			}
 			if (up && Mathf.Abs (transform.position.y - startPos.y) < verticalMovement) {
 				transform.Translate (new Vector3 (0, speed * Time.deltaTime, 0));
+				if(passenger)
+					passenger.transform.Translate (new Vector3 (0, speed * Time.deltaTime, 0));
 				if (Mathf.Abs (transform.position.y - startPos.y) >= verticalMovement) {
 					up = false;
 					if(verticalMovement > horizontalMovement)
@@ -47,6 +66,8 @@ public class MovingPlatform : MonoBehaviour {
 			}
 			if (!up && Mathf.Abs (transform.position.y - startPos.y) >= 0) {
 				transform.Translate (new Vector3 (0, -speed * Time.deltaTime, 0));
+				if(passenger)
+					passenger.transform.Translate (new Vector3 (0, -speed * Time.deltaTime, 0));
 				if (transform.position.y - startPos.y <= 0) {
 					up = true;
 					if(verticalMovement > horizontalMovement)

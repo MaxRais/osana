@@ -93,7 +93,7 @@ public class Enemy : MonoBehaviour {
 			}
 		}
 		if (col.gameObject.tag == "Player") {
-			Vector2 bumpDir = (col.transform.position - transform.position);
+			Vector2 bumpDir = (col.transform.position - transform.position).normalized;
 			col.gameObject.GetComponent<Player> ().TakeDamage (bumpDamage, bumpDir);
 		}
 	}
@@ -111,7 +111,7 @@ public class Enemy : MonoBehaviour {
 		if (snapDown) {
 			rb.gravityScale = 1;
 			dir.x *= dmgBounceback;
-			dir.y = 1.1f * dmgBounceback;
+			dir.y = 1.2f * dmgBounceback;
 			rb.constraints = RigidbodyConstraints2D.FreezeRotation;
 			rb.velocity = (dir * amt);
 		} else {
@@ -121,7 +121,18 @@ public class Enemy : MonoBehaviour {
 				snapDown = true;
 			}
 		}
-		StartCoroutine (HitPause ());
+		StartCoroutine (Blink (amt));
+	}
+
+	IEnumerator Blink(int amt) {
+		for (int i = 0; i < amt * 2; i++) {
+			if (i % 2 == 0)
+				this.GetComponentInChildren<SpriteRenderer> ().color = Color.red;
+			else
+				this.GetComponentInChildren<SpriteRenderer> ().color = Color.white;
+			yield return new WaitForSeconds (0.1f/((float)amt));
+		}
+
 	}
 
 	IEnumerator HitPause() {

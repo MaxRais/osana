@@ -18,7 +18,7 @@ public class Disease : MonoBehaviour {
 		string name = c.collider.name;
 		if(name.Contains("Player")) {
 			GameObject player = GameObject.Find (name);
-			player.GetComponent<Player> ().TakeDamage(1,(c.transform.position - transform.position));
+			player.GetComponent<Player> ().TakeDamage(1,(c.transform.position - transform.position).normalized);
 		}
 	}
 }
