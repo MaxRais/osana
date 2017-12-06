@@ -86,7 +86,7 @@ public class Player : MonoBehaviour
         HandleWallSliding();
 
 		RaycastHit2D hit = Physics2D.Raycast(transform.position, -Vector3.up, 2f, ~(1 << 8));
-		if (hit.collider != null) {
+		if (hit.collider != null && hit.collider.tag == "Obstacle") {
 			float distanceToGround = hit.distance;
 			if (distanceToGround < 1.23f)
 				transform.Translate (new Vector3 (0, 1.23f - distanceToGround));
