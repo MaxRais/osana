@@ -35,10 +35,7 @@ public class Enemy : MonoBehaviour {
 		// Snap enemy to platform they are on
 		RaycastHit2D hit = Physics2D.Raycast(transform.position, (snapDown ? Vector2.down : Vector2.up), 25f, ~(1 << 10));
 		if (hit.collider != null && hit.collider.tag == "Obstacle") { 
-			transform.parent = null;
-			transform.position = hit.point + (hit.normal * sizeOffset);
-			transform.rotation = Quaternion.FromToRotation (transform.up, hit.normal) * transform.rotation;
-			transform.SetParent (hit.transform);
+			SnapTo (hit.transform, hit.point);
 		}
 	}
 	
@@ -65,21 +62,29 @@ public class Enemy : MonoBehaviour {
 		}
 	}
 
+	void SnapTo(Transform surface, Vector3 pos) {
+		transform.parent = null;
+		transform.position = pos;
+		transform.rotation = Quaternion.FromToRotation (transform.up, (snapDown ? surface.up : -surface.up)) * transform.rotation;
+		transform.SetParent (surface);
+	}
+
 	void FixedUpdate() {
 		RaycastHit2D hit = Physics2D.Raycast(transform.position + transform.right * direction, (snapDown ? Vector2.down : Vector2.up), 2.8f, ~(1 << 10));
 		if (hit.collider == null) {	
 			traveled = 0;
 			direction *= -1;
 		} else if (hit.collider != null && hit.collider.tag == "Obstacle" && hit.transform != this.transform.parent) {
-			transform.parent = null;
-			transform.position = hit.point + (hit.normal * sizeOffset);
-			transform.rotation = Quaternion.FromToRotation (transform.up, hit.normal) * transform.rotation;
-			transform.SetParent (hit.transform);
+			SnapTo (hit.transform, hit.point);
 		}
 	}
 
 	void OnCollisionEnter2D(Collision2D col) {
 		if (col.gameObject.tag == "Obstacle") {
+			foreach (ContactPoint2D contact in col.contacts) {
+				print (contact.point);
+				Debug.DrawRay (contact.point, contact.normal, Color.white);
+			}
 			Rigidbody2D rb = this.GetComponent<Rigidbody2D> ();
 			if (col.relativeVelocity.y > 10) {
 				rb.velocity = Vector2.zero;
