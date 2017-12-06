@@ -35,6 +35,7 @@ public class Enemy : MonoBehaviour {
 		// Snap enemy to platform they are on
 		RaycastHit2D hit = Physics2D.Raycast(transform.position, (snapDown ? Vector2.down : Vector2.up), 25f, ~(1 << 10));
 		if (hit.collider != null && hit.collider.tag == "Obstacle") { 
+			transform.parent = null;
 			transform.position = hit.point + (hit.normal * sizeOffset);
 			transform.rotation = Quaternion.FromToRotation (transform.up, hit.normal) * transform.rotation;
 			transform.SetParent (hit.transform);
@@ -86,10 +87,6 @@ public class Enemy : MonoBehaviour {
 			} else if (col.relativeVelocity.y < 10) {
 				rb.gravityScale = 0;
 				rb.velocity = new Vector2 (0, 0);
-				transform.parent = null;
-				transform.rotation = Quaternion.FromToRotation (transform.up, (snapDown ? col.transform.up : -col.transform.up)) * transform.rotation;
-				transform.SetParent (col.transform);
-				rb.constraints = RigidbodyConstraints2D.FreezePositionX | RigidbodyConstraints2D.FreezeRotation;
 			}
 		}
 		if (col.gameObject.tag == "Player") {
@@ -98,9 +95,11 @@ public class Enemy : MonoBehaviour {
 		}
 	}
 	void OnCollisionExit2D(Collision2D col) {
-		if (col.gameObject.tag == "Obstacle" && snapDown) {
-			Rigidbody2D rb = this.GetComponent<Rigidbody2D> ();
-			rb.gravityScale = 1;
+		if (col.gameObject.tag == "Obstacle") {
+			if (snapDown) {
+				Rigidbody2D rb = this.GetComponent<Rigidbody2D> ();
+				rb.gravityScale = 1;
+			}
 		}
 	}
 

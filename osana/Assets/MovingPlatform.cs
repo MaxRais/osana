@@ -21,12 +21,13 @@ public class MovingPlatform : MonoBehaviour {
 
 	void OnCollisionEnter2D(Collision2D c) {
 		if (c.gameObject.tag == "Player") {
+			Debug.Log("Hit, parented");
 			passenger = c.gameObject;
 		}
 	}
 	void OnCollisionExit2D(Collision2D c) {
 		if (c.gameObject.tag == "Player") {
-			if(c.rigidbody.velocity.y > 0)
+			if(c.gameObject.GetComponent<Player>().Jumping())
 				passenger = null;
 		}
 	}

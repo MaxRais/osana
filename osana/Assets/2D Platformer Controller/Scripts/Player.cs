@@ -18,6 +18,7 @@ public class Player : MonoBehaviour
     public Vector2 wallLeap;
 
     public bool canDoubleJump;
+	private bool isJumping = false;
     private bool isDoubleJumping = false;
 	private bool facingRight = true;
 	private float xScale;
@@ -75,6 +76,10 @@ public class Player : MonoBehaviour
 		DisplayMessage.ins.clearQueue ();
 	}
 
+	public bool Jumping() {
+		return isJumping;
+	}
+
     private void Update()
 	{
         CalculateVelocity();
@@ -85,6 +90,9 @@ public class Player : MonoBehaviour
 			float distanceToGround = hit.distance;
 			if (distanceToGround < 1.23f)
 				transform.Translate (new Vector3 (0, 1.23f - distanceToGround));
+		}
+		if (controller.collisions.below && isJumping && velocity.y < 0) {
+			isJumping = false;
 		}
 
 
@@ -101,7 +109,7 @@ public class Player : MonoBehaviour
 		controller.Move (velocity * Time.deltaTime, directionalInput);
         if (controller.collisions.above || controller.collisions.below)
         {
-            //velocity.y = 0f;
+            velocity.y = 0f;
 
 			if (controller.collisions.below) {
 				animator.SetBool ("jumping", false);
@@ -207,7 +215,8 @@ public class Player : MonoBehaviour
         }
         if (controller.collisions.below)
         {
-            velocity.y = maxJumpVelocity;
+			velocity.y = maxJumpVelocity;
+			isJumping = true;
             isDoubleJumping = false;
         }
         if (canDoubleJump && !controller.collisions.below && !isDoubleJumping && !wallSliding)
