@@ -130,7 +130,6 @@ public class Player : MonoBehaviour
 		}
 
 		checkForDead ();
-		checkForWin ();
     }
 
 	void FixedUpdate() {
@@ -330,13 +329,6 @@ public class Player : MonoBehaviour
 		if (this.transform.position.y < deathMarker.position.y) {
 			restart ();
 		} else if (this.health <= 0) {
-			restart ();
-		}
-	}
-
-	private void checkForWin() {
-		Transform winMarker = GameObject.FindGameObjectWithTag ("Finish").transform;
-		if (Vector3.Distance (this.transform.position, winMarker.position) < 5f) {
 			restart ();
 		}
 	}
