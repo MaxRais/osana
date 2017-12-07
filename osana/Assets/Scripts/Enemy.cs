@@ -28,16 +28,13 @@ public class Enemy : MonoBehaviour {
 		traveled = 0;
 		direction = 1;
 		shot = false;
-		if (!snapDown) {
-			this.GetComponent<Rigidbody2D> ().gravityScale = 0;
-			transform.rotation = new Quaternion (0, 0, -180, 0);
-		}
+		this.GetComponent<Rigidbody2D> ().gravityScale = 0;
 
 
 		// Snap enemy to platform they are on
 		RaycastHit2D hit = Physics2D.Raycast(transform.position, (snapDown ? Vector2.down : Vector2.up), 25f, ~(1 << 10));
 		if (hit.collider != null && hit.collider.tag == "Obstacle") { 
-			SnapTo (hit.transform, hit.point,  (snapDown ? hit.transform.up : -hit.transform.up));
+			SnapTo (hit.transform, hit.point,  hit.normal);
 		}
 	}
 	
@@ -73,20 +70,27 @@ public class Enemy : MonoBehaviour {
 	}
 
 	void FixedUpdate() {
-		RaycastHit2D hit = Physics2D.Raycast(transform.position + transform.right * direction, (snapDown ? -Vector3.up : Vector3.up), 2.8f, ~(1 << 10));
-		if (hit.collider == null) {	
-			traveled = 0;
-			direction *= -1;
+		RaycastHit2D hit = Physics2D.Raycast(transform.position, -transform.up, 2.8f, ~(1 << 10));
+		RaycastHit2D hit2 = Physics2D.Raycast(transform.position + transform.right * direction * 1.3f, -transform.up + transform.right * -direction, 4f, ~(1 << 10));
+		if (hit.collider == null) {
+			if (hit2.collider == null) {	
+				traveled = 0;
+				direction *= -1;
+			} else if (hit2.collider != null && hit2.collider.tag == "Obstacle") {
+				SnapTo (hit2.transform, hit2.point, hit2.normal);
+			}
 		} else if (hit.collider != null && hit.collider.tag == "Obstacle" && hit.transform != this.transform.parent) {
 			SnapTo (hit.transform, hit.point, hit.normal);
+		}
+		RaycastHit2D hit3 = Physics2D.Raycast(transform.position, transform.right * direction, 3f, ~(1 << 10));
+		if (hit3.collider != null && hit3.collider.tag == "Obstacle" && hit3.transform != this.transform.parent) {
+			SnapTo (hit3.transform, hit3.point, hit3.normal);
 		}
 		snapDown = (this.transform.up.y > 0);
 	}
 
 	void OnCollisionEnter2D(Collision2D col) {
-		if (col.gameObject.tag == "Obstacle" && this.transform.parent != col.transform) {
-			Vector3 newPos = transform.position;
-			SnapTo (col.transform, transform.position, col.contacts[0].normal);
+		if (col.gameObject.tag == "Obstacle") {
 			Rigidbody2D rb = this.GetComponent<Rigidbody2D> ();
 			if (col.relativeVelocity.y > 10) {
 				rb.velocity = Vector2.zero;
@@ -95,6 +99,9 @@ public class Enemy : MonoBehaviour {
 				rb.gravityScale = 0;
 				rb.velocity = new Vector2 (0, 0);
 			}
+		}
+		if (col.gameObject.tag == "Enemy") {
+			direction *= -1;
 		}
 		if (col.gameObject.tag == "Player") {
 			Vector2 bumpDir = (col.transform.position - transform.position).normalized;
@@ -107,7 +114,6 @@ public class Enemy : MonoBehaviour {
 		this.health -= amt;
 		Rigidbody2D rb = this.GetComponent<Rigidbody2D> ();
 		if (snapDown) {
-			rb.gravityScale = 1;
 			dir.x *= dmgBounceback;
 			dir.y = 1.2f * dmgBounceback;
 			rb.constraints = RigidbodyConstraints2D.FreezeRotation;
@@ -115,9 +121,10 @@ public class Enemy : MonoBehaviour {
 			rb.gravityScale = 1;
 		} else {
 			if (this.health / maxHealth <= 0.5) {
-				rb.gravityScale = 1;
 				rb.velocity = Vector2.zero;
 				rb.gravityScale = 1;
+				transform.parent = null;
+				transform.rotation = new Quaternion (0, 0, 0, 0);
 				snapDown = true;
 			}
 		}
