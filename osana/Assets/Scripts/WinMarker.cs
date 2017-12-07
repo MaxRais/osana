@@ -17,7 +17,10 @@ public class WinMarker : MonoBehaviour {
 
 	void OnCollisionEnter2D(Collision2D c) {
 		if (c.gameObject.name == "Player") {
-			SceneManager.LoadScene ("Outro");
+			if (GameObject.Find ("GameManager").GetComponent<GameManager> ().IsFinished ())
+				SceneManager.LoadScene ("Outro");
+			else
+				DisplayMessage.ins.showMessage ("Not enough kills yet. Kills remaining: " + GameObject.Find ("GameManager").GetComponent<GameManager> ().KillsLeft (), 2);
 		}
 	}
 }

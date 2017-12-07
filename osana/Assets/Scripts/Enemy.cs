@@ -53,6 +53,7 @@ public class Enemy : MonoBehaviour {
 			direction *= -1;
 		}
 		if (health <= 0) {
+			GameObject.Find ("GameManager").GetComponent<GameManager> ().AddKill ();
 			Destroy (this.gameObject);
 		}
 

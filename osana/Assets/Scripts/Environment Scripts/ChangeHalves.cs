@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class ChangeHalves : MonoBehaviour {
 	private GameObject player, leftHalf, rightHalf;
-	public float switchPos, endPos;
+	public Transform switchPos, endPos;
 	// Use this for initialization
 	void Start () {
 		player = GameObject.Find ("Player");
@@ -15,16 +15,19 @@ public class ChangeHalves : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-		if (player.transform.position.x > endPos) {
+		if (player.transform.position.x > endPos.position.x) {
 			leftHalf.GetComponent<BoneRotate> ().enabled = false;
 			rightHalf.GetComponent<BoneRotate> ().enabled = false;
-		}
-		else if (player.transform.position.x > switchPos) {
+			if(player.GetComponent<Player>().spawnPoint.position.x < endPos.position.x)
+				player.GetComponent<Player> ().updateSpawnPoint (endPos);
+		} else if (player.transform.position.x > switchPos.position.x) {
 			leftHalf.GetComponent<BoneRotate> ().enabled = false;
 			rightHalf.GetComponent<BoneRotate> ().enabled = true;
 			player.GetComponent<Player> ().environment = rightHalf.transform;
+			if(player.GetComponent<Player>().spawnPoint.position.x < switchPos.position.x)
+				player.GetComponent<Player> ().updateSpawnPoint (switchPos);
 		}
-		else if (player.transform.position.x <= switchPos) {
+		else if (player.transform.position.x <= switchPos.position.x) {
 			rightHalf.GetComponent<BoneRotate> ().enabled = false;
 			leftHalf.GetComponent<BoneRotate> ().enabled = true;
 			player.GetComponent<Player> ().environment = leftHalf.transform;

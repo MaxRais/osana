@@ -47,6 +47,9 @@ public class Player : MonoBehaviour
 	public float aimSensitivity;
 	private float aimHeight;
 	public float bulletSpeed;
+	public float shotDelay = 0.75f;
+	private float shotTimer;
+	private bool shot = false;
 	public GameObject bulletPrefab;
 	public float health;
 	private float startHealth;
@@ -54,7 +57,7 @@ public class Player : MonoBehaviour
 	private bool dashCooldown;
 	private float dashTimer;
 	private GameObject recharge;
-	private GameObject healthBar;
+	public GameObject healthBar;
 
     private void Start()
     {
@@ -62,7 +65,6 @@ public class Player : MonoBehaviour
 		dashCooldown = false;
 		dashTimer = 0;
 		recharge = GameObject.Find ("RechargeBar");
-		healthBar = GameObject.Find ("Healthbar");
         controller = GetComponent<Controller2D>();
 		animator = this.gameObject.transform.GetChild (0).GetComponent<Animator> ();
         gravity = -(2 * maxJumpHeight) / Mathf.Pow(timeToJumpApex, 2);
@@ -79,6 +81,10 @@ public class Player : MonoBehaviour
 		DisplayMessage.ins.clearQueue ();
 	}
 
+	public void updateSpawnPoint(Transform newPos) {
+		spawnPoint.position = newPos.position;
+	}
+
 	public bool Jumping() {
 		return isJumping;
 	}
@@ -86,6 +92,12 @@ public class Player : MonoBehaviour
     private void Update()
 	{
 		healthBar.transform.localScale = new Vector3 ((health / startHealth) * 3f, 0.25f, 0.35f);
+
+		shotTimer += Time.deltaTime;
+		if (shotTimer >= shotDelay) {
+			shotTimer = 0;
+			shot = false;
+		}
         CalculateVelocity();
         HandleWallSliding();
 
@@ -98,7 +110,6 @@ public class Player : MonoBehaviour
 		if (controller.collisions.below && isJumping && velocity.y < 0) {
 			isJumping = false;
 		}
-
 
 		if (dashCooldown) {
 			recharge.GetComponent<SpriteRenderer> ().enabled = true;
@@ -260,17 +271,19 @@ public class Player : MonoBehaviour
 
 	public void ShootProjectile()
 	{
+		if (shot)
+			return;
 		GameObject bullet = Instantiate (bulletPrefab) as GameObject;
 		bullet.transform.position = this.transform.position;
 		Vector2 dir = new Vector2 (0f, 0f);
 		if (directionalInput.x < 0 && directionalInput.y > 0)
-			dir.Set (-0.5f, 0.25f);
+			dir.Set (-0.5f, (isJumping ? 0.5f : 0.25f));
 		if (directionalInput.x > 0 && directionalInput.y > 0)
-			dir.Set (0.5f, 0.25f);
+			dir.Set (0.5f, (isJumping ? 0.5f : 0.25f));
 		if (directionalInput.x < 0 && directionalInput.y < 0)
-			dir.Set (-0.5f, -0.25f);
+			dir.Set (-0.5f, (isJumping ? -0.5f : -0.25f));
 		if (directionalInput.x > 0 && directionalInput.y < 0)
-			dir.Set (0.5f, -0.25f);
+			dir.Set (0.5f, (isJumping ? -0.5f : -0.25f));
 		if (directionalInput.x == 0 && directionalInput.y > 0)
 			dir.Set (0, 1);
 		if (directionalInput.x == 0 && directionalInput.y < 0)
@@ -284,6 +297,7 @@ public class Player : MonoBehaviour
 		bullet.transform.position += new Vector3(dir.x * 1.5f, dir.y * 1.5f, 0);
 		bullet.transform.parent = environment;
 		script.source = this.gameObject;
+		shot = true;
 	}
 
     private void HandleWallSliding()
