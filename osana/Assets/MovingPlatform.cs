@@ -26,7 +26,7 @@ public class MovingPlatform : MonoBehaviour {
 	}
 	void OnCollisionExit2D(Collision2D c) {
 		if (c.gameObject.tag == "Player") {
-			if(c.gameObject.GetComponent<Player>().Jumping())
+			//if(c.gameObject.GetComponent<Player>().Jumping())
 				passenger = null;
 		}
 	}

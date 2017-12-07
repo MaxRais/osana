@@ -42,6 +42,7 @@ public class Player : MonoBehaviour
 
 	public Transform deathMarker;
 	public Transform spawnPoint;
+	public Transform environment;
 
 	public float aimSensitivity;
 	private float aimHeight;
@@ -131,6 +132,18 @@ public class Player : MonoBehaviour
 		checkForDead ();
 		checkForWin ();
     }
+
+	void FixedUpdate() {
+		Rigidbody2D rb = this.GetComponent<Rigidbody2D> ();
+		if (velocity.y < 0) {
+			RaycastHit2D hit = Physics2D.Raycast (transform.position, Vector2.down, 2f, ~(1 << 8));
+			if (hit.collider != null && hit.collider.tag == "Obstacle") {
+				transform.position = hit.point + Vector2.up;
+				rb.constraints = (RigidbodyConstraints2D.FreezeRotation | RigidbodyConstraints2D.FreezePositionY);
+				rb.velocity = new Vector2 (0, 0);
+			}
+		}
+	}
 
 	public void TakeDamage(int amt, Vector2 dir) {
 		this.health -= amt;
@@ -249,13 +262,13 @@ public class Player : MonoBehaviour
 		bullet.transform.position = this.transform.position;
 		Vector2 dir = new Vector2 (0f, 0f);
 		if (directionalInput.x < 0 && directionalInput.y > 0)
-			dir.Set (-0.5f, 0.3f);
+			dir.Set (-0.5f, 0.25f);
 		if (directionalInput.x > 0 && directionalInput.y > 0)
-			dir.Set (0.5f, 0.3f);
+			dir.Set (0.5f, 0.25f);
 		if (directionalInput.x < 0 && directionalInput.y < 0)
-			dir.Set (-0.5f, -0.3f);
+			dir.Set (-0.5f, -0.25f);
 		if (directionalInput.x > 0 && directionalInput.y < 0)
-			dir.Set (0.5f, -0.3f);
+			dir.Set (0.5f, -0.25f);
 		if (directionalInput.x == 0 && directionalInput.y > 0)
 			dir.Set (0, 1);
 		if (directionalInput.x == 0 && directionalInput.y < 0)
@@ -267,6 +280,7 @@ public class Player : MonoBehaviour
 		script.speed = bulletSpeed;
 		script.direction = facingRight ? 1 : -1;
 		bullet.transform.position += new Vector3(dir.x * 1.5f, dir.y * 1.5f, 0);
+		bullet.transform.parent = environment;
 		script.source = this.gameObject;
 	}
 

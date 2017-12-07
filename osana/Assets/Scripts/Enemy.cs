@@ -14,9 +14,8 @@ public class Enemy : MonoBehaviour {
 	public float bulletSpeed;
 	public GameObject bulletPrefab;
 	private bool shot;
-	public float sizeOffset = 5f;
 	public bool snapDown = true;
-	public float dmgBounceback = 20f;
+	public float dmgBounceback = 2f;
 	public float bounciness = 15f;
 	public float shotDelay = 3f;
 	public int bumpDamage = 1;
@@ -71,7 +70,7 @@ public class Enemy : MonoBehaviour {
 
 	void FixedUpdate() {
 		RaycastHit2D hit = Physics2D.Raycast(transform.position, -transform.up, 2.8f, ~(1 << 10));
-		RaycastHit2D hit2 = Physics2D.Raycast(transform.position + transform.right * direction * 1.3f, -transform.up + transform.right * -direction, 4f, ~(1 << 10));
+		RaycastHit2D hit2 = Physics2D.Raycast(transform.position + transform.right * direction * 1.3f, -transform.up + transform.right * -direction, 3.1f, ~(1 << 10));
 		if (hit.collider == null) {
 			if (hit2.collider == null) {	
 				traveled = 0;
