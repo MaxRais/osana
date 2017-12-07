@@ -86,6 +86,8 @@ public class Enemy : MonoBehaviour {
 			SnapTo (hit3.transform, hit3.point, hit3.normal);
 		}
 		snapDown = (this.transform.up.y > 0);
+		if (snapDown)
+			maxHealth = health;
 	}
 
 	void OnCollisionEnter2D(Collision2D col) {
@@ -124,7 +126,6 @@ public class Enemy : MonoBehaviour {
 				rb.gravityScale = 1;
 				transform.parent = null;
 				transform.rotation = new Quaternion (0, 0, 0, 0);
-				snapDown = true;
 			}
 		}
 		StartCoroutine (Blink (amt));
