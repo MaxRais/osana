@@ -48,12 +48,13 @@ public class Player : MonoBehaviour
 	private float aimHeight;
 	public float bulletSpeed;
 	public GameObject bulletPrefab;
-	public int health;
-	private int startHealth;
+	public float health;
+	private float startHealth;
 	public float dashCooldownTimer;
 	private bool dashCooldown;
 	private float dashTimer;
 	private GameObject recharge;
+	private GameObject healthBar;
 
     private void Start()
     {
@@ -61,6 +62,7 @@ public class Player : MonoBehaviour
 		dashCooldown = false;
 		dashTimer = 0;
 		recharge = GameObject.Find ("RechargeBar");
+		healthBar = GameObject.Find ("Healthbar");
         controller = GetComponent<Controller2D>();
 		animator = this.gameObject.transform.GetChild (0).GetComponent<Animator> ();
         gravity = -(2 * maxJumpHeight) / Mathf.Pow(timeToJumpApex, 2);
@@ -83,6 +85,7 @@ public class Player : MonoBehaviour
 
     private void Update()
 	{
+		healthBar.transform.localScale = new Vector3 ((health / startHealth) * 3f, 0.25f, 0.35f);
         CalculateVelocity();
         HandleWallSliding();
 
