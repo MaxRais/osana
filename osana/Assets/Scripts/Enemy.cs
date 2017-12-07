@@ -13,6 +13,7 @@ public class Enemy : MonoBehaviour {
 	public int health;
 	public float bulletSpeed;
 	public GameObject bulletPrefab;
+	public TextMesh healthText;
 	private bool shot;
 	public bool snapDown = true;
 	public float dmgBounceback = 2f;
@@ -39,6 +40,7 @@ public class Enemy : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
+		healthText.text = health.ToString();
 		shotTimer += Time.deltaTime;
 		if (shotTimer >= shotDelay) {
 			shotTimer = 0;
@@ -46,7 +48,7 @@ public class Enemy : MonoBehaviour {
 		}
 		traveled += Vector3.Distance (transform.position, transform.position + transform.right * speed * Time.deltaTime * direction);
 		this.transform.position += transform.right * speed * Time.deltaTime * direction;
-		if (traveled >= range) {
+		if (traveled >= range && range > 0) {
 			traveled = 0;
 			direction *= -1;
 		}
@@ -85,7 +87,7 @@ public class Enemy : MonoBehaviour {
 		if (hit3.collider != null && hit3.collider.tag == "Obstacle" && hit3.transform != this.transform.parent) {
 			SnapTo (hit3.transform, hit3.point, hit3.normal);
 		}
-		snapDown = (this.transform.up.y > 0);
+		snapDown = (this.transform.up.y > 0.1f);
 		if (snapDown)
 			maxHealth = health;
 	}
