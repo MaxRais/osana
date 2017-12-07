@@ -11,6 +11,7 @@ public class CutsceneSequence : MonoBehaviour {
 	public float displayTime = 1f;
 	public float fadeTime = .0001f;
 	private bool fading = false;
+	public bool showLogoLast;
 
 	// Use this for initialization
 	void Start () {
@@ -23,10 +24,12 @@ public class CutsceneSequence : MonoBehaviour {
 
 	private IEnumerator playCutscene() {
 		yield return new WaitForSeconds (1.0f);
-		fading = true;
-		StartCoroutine (fadeImage (logo));
-		while (fading) {
-			yield return null;
+		if (!showLogoLast) {
+			fading = true;
+			StartCoroutine (fadeLogoOut (logo));
+			while (fading) {
+				yield return null;
+			}
 		}
 
 		foreach(Text t in messages) {
@@ -36,11 +39,19 @@ public class CutsceneSequence : MonoBehaviour {
 				yield return null;
 			}
 		}
-		SceneManager.LoadScene ("Level1");
+
+		if (showLogoLast) {
+			fading = true;
+			StartCoroutine (fadeLogoIn (logo));
+			while (fading) {
+				yield return null;
+			}
+		} else {
+			SceneManager.LoadScene ("Level1");
+		}
 	}
 
 	private IEnumerator fadeMessage(Text message) {
-		fading = true;
 		while (message.color.a < 1.0f) {
 			setTextAlpha (message, message.color.a + Time.deltaTime);
 			yield return null;
@@ -54,11 +65,18 @@ public class CutsceneSequence : MonoBehaviour {
 		fading = false;
 	}
 
-	private IEnumerator fadeImage(Image image) {
-		yield return new WaitForSeconds (displayTime);
+	private IEnumerator fadeLogoOut(Image image) {
 		while (image.color.a > 0.0f)
 		{
 			setImageAlpha(image, image.color.a - Time.deltaTime);
+			yield return null;
+		}
+		fading = false;
+	}
+
+	private IEnumerator fadeLogoIn(Image image) {
+		while (image.color.a < 1.0f) {
+			setImageAlpha (image, image.color.a + Time.deltaTime);
 			yield return null;
 		}
 		fading = false;
@@ -76,6 +94,8 @@ public class CutsceneSequence : MonoBehaviour {
 
 	// Update is called once per frame
 	void Update () {
-		
+		if (Input.GetKeyDown (KeyCode.Space)) {
+			SceneManager.LoadScene ("Level1");
+		}
 	}
 }

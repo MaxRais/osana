@@ -16,7 +16,6 @@ public class WinMarker : MonoBehaviour {
 	}
 
 	void OnCollisionEnter2D(Collision2D c) {
-		Debug.Log (c.gameObject.name);
 		if (c.gameObject.name == "Player") {
 			SceneManager.LoadScene ("Outro");
 		}
