@@ -36,6 +36,9 @@ public class Player : MonoBehaviour
     private Controller2D controller;
 	private Animator animator;
 
+	public AudioClip jumpClip;
+	public AudioClip walkClip;
+
     private Vector2 directionalInput;
     private bool wallSliding;
     private int wallDirX;
@@ -55,6 +58,7 @@ public class Player : MonoBehaviour
 	private float startHealth;
 	public float dashCooldownTimer;
 	private bool dashCooldown;
+	private bool dead;
 	private float dashTimer;
 	private GameObject recharge;
 	public GameObject healthBar;
@@ -63,6 +67,7 @@ public class Player : MonoBehaviour
     {
 		dashCooldownTimer = 1f;
 		dashCooldown = false;
+		dead = false;
 		dashTimer = 0;
 		recharge = GameObject.Find ("RechargeBar");
         controller = GetComponent<Controller2D>();
@@ -79,6 +84,15 @@ public class Player : MonoBehaviour
 		this.health = startHealth;
 		this.transform.position = spawnPoint.position;
 		DisplayMessage.ins.clearQueue ();
+		dead = false;
+		animator.SetBool ("dead", false);
+	}
+
+	IEnumerator Die() {
+		animator.SetBool ("dead", true);
+		dead = true;
+		yield return new WaitForSeconds(3);
+		restart();
 	}
 
 	public void updateSpawnPoint(Transform newPos) {
@@ -98,8 +112,8 @@ public class Player : MonoBehaviour
 			shotTimer = 0;
 			shot = false;
 		}
-        CalculateVelocity();
-        HandleWallSliding();
+		CalculateVelocity ();
+		HandleWallSliding ();
 
 		RaycastHit2D hit = Physics2D.Raycast(transform.position, -Vector3.up, 2f, ~(1 << 8));
 		if (hit.collider != null && hit.collider.tag == "Obstacle") {
@@ -159,9 +173,11 @@ public class Player : MonoBehaviour
 	}
 
 	public void TakeDamage(int amt, Vector2 dir) {
-		this.health -= amt;
-		ApplyPush (amt, dir);
-		StartCoroutine (Blink (amt));
+		if (!dead) {
+			this.health -= amt;
+			ApplyPush (amt, dir);
+			StartCoroutine (Blink (amt));
+		}
 	}
 
 	void ApplyPush(int amt, Vector2 dir) {
@@ -176,6 +192,10 @@ public class Player : MonoBehaviour
 			Rigidbody2D rb = this.GetComponent<Rigidbody2D> ();
 			rb.constraints = (RigidbodyConstraints2D.FreezeRotation | RigidbodyConstraints2D.FreezePositionY);
 			rb.velocity = new Vector2(0,0);
+
+			Vector3 contact = c.contacts [0].point;
+			if ((controller.collisions.below && contact.y > transform.position.y) || (controller.collisions.above && contact.y < transform.position.y))
+				restart ();
 		}
 	}
 
@@ -193,18 +213,20 @@ public class Player : MonoBehaviour
     public void SetDirectionalInput(Vector2 input)
     {
         directionalInput = input;
-		if (input.x == -1) {
+		if (input.x == -1 && !dead) {
 			//this.gameObject.transform.GetChild (0).GetComponent<SpriteRenderer> ().sprite = osanaLeft;
 			facingRight = false;
 			if (controller.collisions.below) {
 				animator.SetInteger ("xDir", -1);
+				SoundManager.ins.PlaySingle (walkClip);
 			}
 			this.transform.localScale = new Vector3 (-1, 1, 1);
-		} else if (input.x == 1) {
+		} else if (input.x == 1 && !dead) {
 			//this.gameObject.transform.GetChild (0).GetComponent<SpriteRenderer> ().sprite = osanaRight;
 			facingRight = true;
 			if (controller.collisions.below) {
 				animator.SetInteger ("xDir", 1);
+				SoundManager.ins.PlaySingle (walkClip);
 			}
 			this.transform.localScale = Vector3.one;
 		} else if (input.y == 1) {
@@ -238,12 +260,14 @@ public class Player : MonoBehaviour
                 velocity.y = wallLeap.y;
             }
             isDoubleJumping = false;
+			SoundManager.ins.PlaySingle (jumpClip);
         }
         if (controller.collisions.below)
         {
 			velocity.y = maxJumpVelocity;
 			isJumping = true;
-            isDoubleJumping = false;
+			isDoubleJumping = false;
+			SoundManager.ins.PlaySingle (jumpClip);
         }
         if (canDoubleJump && !controller.collisions.below && !isDoubleJumping && !wallSliding)
         {
@@ -251,6 +275,7 @@ public class Player : MonoBehaviour
             isDoubleJumping = true;
 			animator.SetBool ("jumping", false);
 			animator.SetBool ("jumping", true);
+			SoundManager.ins.PlaySingle (jumpClip);
         }
     }
 
@@ -338,6 +363,9 @@ public class Player : MonoBehaviour
         float targetVelocityX = directionalInput.x * moveSpeed;
 		if (velocity.x < 0 && directionalInput.x > 0 || velocity.x > 0 && directionalInput.x < 0)
 			velocity.x = 0;
+		if (dead) {
+			targetVelocityX = 0;
+		}
         velocity.x = Mathf.SmoothDamp(velocity.x, targetVelocityX, ref velocityXSmoothing, (controller.collisions.below ? accelerationTimeGrounded : accelerationTimeAirborne));
         velocity.y += gravity * Time.deltaTime;
     }
@@ -346,7 +374,7 @@ public class Player : MonoBehaviour
 		if (this.transform.position.y < deathMarker.position.y) {
 			restart ();
 		} else if (this.health <= 0) {
-			restart ();
+			StartCoroutine (Die ());
 		}
 	}
 }
