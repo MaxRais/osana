@@ -36,6 +36,9 @@ public class Player : MonoBehaviour
     private Controller2D controller;
 	private Animator animator;
 
+	public AudioClip jumpClip;
+	public AudioClip walkClip;
+
     private Vector2 directionalInput;
     private bool wallSliding;
     private int wallDirX;
@@ -215,6 +218,7 @@ public class Player : MonoBehaviour
 			facingRight = false;
 			if (controller.collisions.below) {
 				animator.SetInteger ("xDir", -1);
+				SoundManager.ins.PlaySingle (walkClip);
 			}
 			this.transform.localScale = new Vector3 (-1, 1, 1);
 		} else if (input.x == 1 && !dead) {
@@ -222,6 +226,7 @@ public class Player : MonoBehaviour
 			facingRight = true;
 			if (controller.collisions.below) {
 				animator.SetInteger ("xDir", 1);
+				SoundManager.ins.PlaySingle (walkClip);
 			}
 			this.transform.localScale = Vector3.one;
 		} else if (input.y == 1) {
@@ -255,12 +260,14 @@ public class Player : MonoBehaviour
                 velocity.y = wallLeap.y;
             }
             isDoubleJumping = false;
+			SoundManager.ins.PlaySingle (jumpClip);
         }
         if (controller.collisions.below)
         {
 			velocity.y = maxJumpVelocity;
 			isJumping = true;
-            isDoubleJumping = false;
+			isDoubleJumping = false;
+			SoundManager.ins.PlaySingle (jumpClip);
         }
         if (canDoubleJump && !controller.collisions.below && !isDoubleJumping && !wallSliding)
         {
@@ -268,6 +275,7 @@ public class Player : MonoBehaviour
             isDoubleJumping = true;
 			animator.SetBool ("jumping", false);
 			animator.SetBool ("jumping", true);
+			SoundManager.ins.PlaySingle (jumpClip);
         }
     }
 
