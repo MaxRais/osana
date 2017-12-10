@@ -55,6 +55,7 @@ public class Player : MonoBehaviour
 	private float startHealth;
 	public float dashCooldownTimer;
 	private bool dashCooldown;
+	private bool dead;
 	private float dashTimer;
 	private GameObject recharge;
 	public GameObject healthBar;
@@ -63,6 +64,7 @@ public class Player : MonoBehaviour
     {
 		dashCooldownTimer = 1f;
 		dashCooldown = false;
+		dead = false;
 		dashTimer = 0;
 		recharge = GameObject.Find ("RechargeBar");
         controller = GetComponent<Controller2D>();
@@ -79,6 +81,15 @@ public class Player : MonoBehaviour
 		this.health = startHealth;
 		this.transform.position = spawnPoint.position;
 		DisplayMessage.ins.clearQueue ();
+		dead = false;
+		this.GetComponentInChildren<SpriteRenderer> ().gameObject.transform.rotation = new Quaternion (0, 0, 0, 0);
+	}
+
+	IEnumerator Die() {
+		this.GetComponentInChildren<SpriteRenderer> ().gameObject.transform.rotation = new Quaternion (0, 0, 90, 0);
+		dead = true;
+		yield return new WaitForSeconds(3);
+		restart();
 	}
 
 	public void updateSpawnPoint(Transform newPos) {
@@ -98,8 +109,10 @@ public class Player : MonoBehaviour
 			shotTimer = 0;
 			shot = false;
 		}
-        CalculateVelocity();
-        HandleWallSliding();
+		if (!dead) {
+			CalculateVelocity ();
+			HandleWallSliding ();
+		}
 
 		RaycastHit2D hit = Physics2D.Raycast(transform.position, -Vector3.up, 2f, ~(1 << 8));
 		if (hit.collider != null && hit.collider.tag == "Obstacle") {
@@ -176,6 +189,10 @@ public class Player : MonoBehaviour
 			Rigidbody2D rb = this.GetComponent<Rigidbody2D> ();
 			rb.constraints = (RigidbodyConstraints2D.FreezeRotation | RigidbodyConstraints2D.FreezePositionY);
 			rb.velocity = new Vector2(0,0);
+
+			Vector3 contact = c.contacts [0].point;
+			if ((controller.collisions.below && contact.y > transform.position.y) || (controller.collisions.above && contact.y < transform.position.y))
+				restart ();
 		}
 	}
 
@@ -346,7 +363,7 @@ public class Player : MonoBehaviour
 		if (this.transform.position.y < deathMarker.position.y) {
 			restart ();
 		} else if (this.health <= 0) {
-			restart ();
+			StartCoroutine (Die ());
 		}
 	}
 }

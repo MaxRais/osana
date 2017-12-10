@@ -53,7 +53,9 @@ public class Enemy : MonoBehaviour {
 			direction *= -1;
 		}
 		if (health <= 0) {
-			GameObject.Find ("GameManager").GetComponent<GameManager> ().AddKill ();
+			GameObject manager = GameObject.Find ("GameManager");
+			if(manager)
+				manager.GetComponent<GameManager> ().AddKill ();
 			Destroy (this.gameObject);
 		}
 
@@ -114,7 +116,7 @@ public class Enemy : MonoBehaviour {
 	public void TakeDamage(int amt, Vector2 dir) {
 		Debug.Log (this.name + " taking " + amt + " dmg");
 		this.health -= amt;
-		Rigidbody2D rb = this.GetComponent<Rigidbody2D> ();
+		/*Rigidbody2D rb = this.GetComponent<Rigidbody2D> ();
 		if (snapDown) {
 			dir.x *= dmgBounceback;
 			dir.y = 1.2f * dmgBounceback;
@@ -128,7 +130,7 @@ public class Enemy : MonoBehaviour {
 				transform.parent = null;
 				transform.rotation = new Quaternion (0, 0, 0, 0);
 			}
-		}
+		}*/
 		StartCoroutine (Blink (amt));
 	}
 

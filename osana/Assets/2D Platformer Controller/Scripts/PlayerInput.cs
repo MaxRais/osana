@@ -25,11 +25,11 @@ public class PlayerInput : MonoBehaviour
             player.OnJumpInputUp();
         }
 
-		if (Input.GetKeyDown (KeyCode.Mouse0) || Input.GetKeyDown (KeyCode.X) )
+		if (Input.GetButtonDown("Fire1"))
 		{
 			player.ShootProjectile ();
 		}
-		if (Input.GetKeyDown (KeyCode.Mouse1) || Input.GetKeyDown (KeyCode.C) )
+		if (Input.GetButtonDown("Fire2") )
 		{
 			player.Dash ();
 		}
