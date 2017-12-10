@@ -69,15 +69,16 @@ public class Enemy : MonoBehaviour {
 
 	void SnapTo(Transform surface, Vector3 pos, Vector3 normal) {
 		transform.parent = null;
-		transform.position = pos;
 		transform.rotation = Quaternion.FromToRotation (transform.up, normal) * transform.rotation;
+		transform.position = pos + transform.up * 1.3f;
 		transform.localScale = new Vector3 (2.5f, 2.5f, 1);
 		transform.SetParent (surface);
 	}
 
 	void FixedUpdate() {
 		RaycastHit2D hit = Physics2D.Raycast(transform.position, -transform.up, 2.8f, ~(1 << 10));
-		RaycastHit2D hit2 = Physics2D.Raycast(transform.position + transform.right * direction * 1.3f, -transform.up + transform.right * -direction, 3.1f, ~(1 << 10));
+		Debug.DrawRay (transform.position + transform.right * direction * 1.3f, -transform.up + transform.right * -direction, Color.red, 3);
+		RaycastHit2D hit2 = Physics2D.Raycast(transform.position + transform.right * direction * 1.3f, -transform.up + transform.right * -direction, 6f, ~(1 << 10));
 		if (hit.collider == null) {
 			if (hit2.collider == null) {	
 				traveled = 0;

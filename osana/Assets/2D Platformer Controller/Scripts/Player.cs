@@ -82,11 +82,11 @@ public class Player : MonoBehaviour
 		this.transform.position = spawnPoint.position;
 		DisplayMessage.ins.clearQueue ();
 		dead = false;
-		this.GetComponentInChildren<SpriteRenderer> ().gameObject.transform.rotation = new Quaternion (0, 0, 0, 0);
+		animator.SetBool ("dead", false);
 	}
 
 	IEnumerator Die() {
-		this.GetComponentInChildren<SpriteRenderer> ().gameObject.transform.rotation = new Quaternion (0, 0, 90, 0);
+		animator.SetBool ("dead", true);
 		dead = true;
 		yield return new WaitForSeconds(3);
 		restart();
@@ -109,10 +109,8 @@ public class Player : MonoBehaviour
 			shotTimer = 0;
 			shot = false;
 		}
-		if (!dead) {
-			CalculateVelocity ();
-			HandleWallSliding ();
-		}
+		CalculateVelocity ();
+		HandleWallSliding ();
 
 		RaycastHit2D hit = Physics2D.Raycast(transform.position, -Vector3.up, 2f, ~(1 << 8));
 		if (hit.collider != null && hit.collider.tag == "Obstacle") {
@@ -172,9 +170,11 @@ public class Player : MonoBehaviour
 	}
 
 	public void TakeDamage(int amt, Vector2 dir) {
-		this.health -= amt;
-		ApplyPush (amt, dir);
-		StartCoroutine (Blink (amt));
+		if (!dead) {
+			this.health -= amt;
+			ApplyPush (amt, dir);
+			StartCoroutine (Blink (amt));
+		}
 	}
 
 	void ApplyPush(int amt, Vector2 dir) {
@@ -210,14 +210,14 @@ public class Player : MonoBehaviour
     public void SetDirectionalInput(Vector2 input)
     {
         directionalInput = input;
-		if (input.x == -1) {
+		if (input.x == -1 && !dead) {
 			//this.gameObject.transform.GetChild (0).GetComponent<SpriteRenderer> ().sprite = osanaLeft;
 			facingRight = false;
 			if (controller.collisions.below) {
 				animator.SetInteger ("xDir", -1);
 			}
 			this.transform.localScale = new Vector3 (-1, 1, 1);
-		} else if (input.x == 1) {
+		} else if (input.x == 1 && !dead) {
 			//this.gameObject.transform.GetChild (0).GetComponent<SpriteRenderer> ().sprite = osanaRight;
 			facingRight = true;
 			if (controller.collisions.below) {
@@ -355,6 +355,9 @@ public class Player : MonoBehaviour
         float targetVelocityX = directionalInput.x * moveSpeed;
 		if (velocity.x < 0 && directionalInput.x > 0 || velocity.x > 0 && directionalInput.x < 0)
 			velocity.x = 0;
+		if (dead) {
+			targetVelocityX = 0;
+		}
         velocity.x = Mathf.SmoothDamp(velocity.x, targetVelocityX, ref velocityXSmoothing, (controller.collisions.below ? accelerationTimeGrounded : accelerationTimeAirborne));
         velocity.y += gravity * Time.deltaTime;
     }
