@@ -9,7 +9,7 @@ public class Enemy : MonoBehaviour {
 	private float traveled;
 	private int direction;
 	public float detectDistance;
-	public GameObject player;
+	private GameObject player;
 	public int health;
 	public float bulletSpeed;
 	public GameObject bulletPrefab;
@@ -29,7 +29,7 @@ public class Enemy : MonoBehaviour {
 		direction = 1;
 		shot = false;
 		this.GetComponent<Rigidbody2D> ().gravityScale = 0;
-
+		player = GameObject.FindGameObjectWithTag ("Player");
 
 		// Snap enemy to platform they are on
 		RaycastHit2D hit = Physics2D.Raycast(transform.position, (snapDown ? Vector2.down : Vector2.up), 25f, ~(1 << 10));
@@ -41,7 +41,8 @@ public class Enemy : MonoBehaviour {
 	// Update is called once per frame
 	void Update () {
 		healthBar.transform.localScale = new Vector3 ((health / maxHealth) , 0.25f, 0.35f);
-		shotTimer += Time.deltaTime;
+		if(shot)
+			shotTimer += Time.deltaTime;
 		if (shotTimer >= shotDelay) {
 			shotTimer = 0;
 			shot = false;
@@ -58,11 +59,12 @@ public class Enemy : MonoBehaviour {
 				manager.GetComponent<GameManager> ().AddKill ();
 			Destroy (this.gameObject);
 		}
-
-		if (Vector3.Distance (this.transform.position, player.transform.position) <= detectDistance &&
+		if (Vector3.Distance (transform.position, player.transform.position) <= detectDistance && 
 			Mathf.Sign(direction) == Mathf.Sign(player.transform.position.x - this.transform.position.x)) {
+			Debug.Log(this.name + " trying to shoot");
 			shootProjectile ();
 		}
+
 	}
 
 	void SnapTo(Transform surface, Vector3 pos, Vector3 normal) {
@@ -156,10 +158,13 @@ public class Enemy : MonoBehaviour {
 		GameObject bullet = Instantiate (bulletPrefab) as GameObject;
 		Bullet script = bullet.GetComponent<Bullet> ();
 		script.speed = bulletSpeed;
+		Vector3 dir = this.transform.position - player.transform.position;
 		script.direction = direction;
 		script.source = this.gameObject;
 		bullet.transform.position = this.transform.position;
-		bullet.transform.position += Vector3.right * this.transform.localScale.x * direction;
+		//bullet.transform.position += Vector3.right * this.transform.localScale.x * direction;
+		bullet.transform.rotation = Quaternion.FromToRotation (transform.right * direction, dir) 
+			* bullet.transform.rotation;
 		shot = true;
 	}
 }
