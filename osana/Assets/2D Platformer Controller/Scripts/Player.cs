@@ -188,8 +188,9 @@ public class Player : MonoBehaviour
 		if (c.gameObject.tag == "Obstacle") {
 			Rigidbody2D rb = this.GetComponent<Rigidbody2D> ();
 			rb.constraints = (RigidbodyConstraints2D.FreezeRotation | RigidbodyConstraints2D.FreezePositionY);
-			rb.velocity = new Vector2(0,0);
-
+			rb.velocity = new Vector2 (0, 0);
+		}
+		if (c.gameObject.tag == "Crushing") {
 			Vector3 contact = c.contacts [0].point;
 			if ((controller.collisions.below && contact.y > transform.position.y) || (controller.collisions.above && contact.y < transform.position.y))
 				restart ();
