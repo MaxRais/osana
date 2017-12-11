@@ -70,28 +70,31 @@ public class Enemy : MonoBehaviour {
 	void SnapTo(Transform surface, Vector3 pos, Vector3 normal) {
 		transform.parent = null;
 		transform.rotation = Quaternion.FromToRotation (transform.up, normal) * transform.rotation;
-		transform.position = pos + transform.up * 1.3f;
+		transform.position = pos;
 		transform.localScale = new Vector3 (2.5f, 2.5f, 1);
 		transform.SetParent (surface);
 	}
 
 	void FixedUpdate() {
 		RaycastHit2D hit = Physics2D.Raycast(transform.position, -transform.up, 2.8f, ~(1 << 10));
-		Debug.DrawRay (transform.position + transform.right * direction * 1.3f, -transform.up + transform.right * -direction, Color.red, 3);
-		RaycastHit2D hit2 = Physics2D.Raycast(transform.position + transform.right * direction * 1.3f, -transform.up + transform.right * -direction, 6f, ~(1 << 10));
-		if (hit.collider == null) {
+		Debug.DrawRay (transform.position - transform.up + (transform.right), -transform.up + transform.right * -direction, Color.cyan, 3f);
+		RaycastHit2D hit2 = Physics2D.Raycast(transform.position - transform.up + (transform.right * direction), -transform.up + transform.right * -direction, 6f, ~(1 << 10));
+		if (hit.collider != null && hit.collider.tag == "Obstacle" && hit.transform != this.transform.parent) {
+			SnapTo (hit.transform, hit.point, hit.normal);
+		} else if (hit.collider == null) {
 			if (hit2.collider == null) {	
 				traveled = 0;
 				direction *= -1;
 			} else if (hit2.collider != null && hit2.collider.tag == "Obstacle") {
 				SnapTo (hit2.transform, hit2.point, hit2.normal);
+
+				Debug.DrawRay (hit2.point, hit2.normal, Color.red, 3);
 			}
-		} else if (hit.collider != null && hit.collider.tag == "Obstacle" && hit.transform != this.transform.parent) {
-			SnapTo (hit.transform, hit.point, hit.normal);
 		}
-		RaycastHit2D hit3 = Physics2D.Raycast(transform.position, transform.right * direction, 3f, ~(1 << 10));
-		if (hit3.collider != null && hit3.collider.tag == "Obstacle" && hit3.transform != this.transform.parent) {
+		RaycastHit2D hit3 = Physics2D.Raycast(transform.position, transform.right * direction,2f, ~(1 << 10));
+		if (hit3.collider != null && hit3.collider.tag == "Obstacle") {
 			SnapTo (hit3.transform, hit3.point, hit3.normal);
+			Debug.DrawRay (hit2.point, hit2.normal,  Color.green, 3);
 		}
 		snapDown = (this.transform.up.y > 0.1f);
 	}
