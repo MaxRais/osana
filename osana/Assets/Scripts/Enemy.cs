@@ -40,6 +40,11 @@ public class Enemy : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
+		BoxCollider2D col = this.GetComponent<BoxCollider2D> ();
+
+		this.transform.position += transform.right * speed * Time.deltaTime * direction;
+		RaycastHit2D hit = Physics2D.Raycast(transform.position, -transform.up, 3f, ~(1 << 10));
+
 		healthBar.transform.localScale = new Vector3 ((health / maxHealth) , 0.25f, 0.35f);
 		if(shot)
 			shotTimer += Time.deltaTime;
@@ -47,11 +52,14 @@ public class Enemy : MonoBehaviour {
 			shotTimer = 0;
 			shot = false;
 		}
-		traveled += Vector3.Distance (transform.position, transform.position + transform.right * speed * Time.deltaTime * direction);
-		this.transform.position += transform.right * speed * Time.deltaTime * direction;
-		if (traveled >= range && range > 0) {
+
+		if ((traveled >= range && range > 0) || hit.collider == null) {
 			traveled = 0;
 			direction *= -1;
+		} else if (hit.collider != null) {
+			Debug.DrawRay (hit.point, hit.normal, Color.cyan, 3f);
+			traveled += Vector3.Distance (transform.position, transform.position + transform.right * speed * Time.deltaTime * direction);
+			SnapTo (hit.transform, hit.point, hit.normal);
 		}
 		if (health <= 0) {
 			GameObject manager = GameObject.Find ("GameManager");
@@ -68,34 +76,43 @@ public class Enemy : MonoBehaviour {
 	}
 
 	void SnapTo(Transform surface, Vector3 pos, Vector3 normal) {
+		BoxCollider2D col = this.GetComponent<BoxCollider2D> ();
 		transform.parent = null;
 		transform.rotation = Quaternion.FromToRotation (transform.up, normal) * transform.rotation;
-		transform.position = pos;
+		transform.position = pos + transform.up * col.size.y * 1.2f;
 		transform.localScale = new Vector3 (2.5f, 2.5f, 1);
 		transform.SetParent (surface);
 	}
 
 	void FixedUpdate() {
-		RaycastHit2D hit = Physics2D.Raycast(transform.position, -transform.up, 2.8f, ~(1 << 10));
-		Debug.DrawRay (transform.position - transform.up + (transform.right), -transform.up + transform.right * -direction, Color.cyan, 3f);
-		RaycastHit2D hit2 = Physics2D.Raycast(transform.position - transform.up + (transform.right * direction), -transform.up + transform.right * -direction, 6f, ~(1 << 10));
-		if (hit.collider != null && hit.collider.tag == "Obstacle" && hit.transform != this.transform.parent) {
-			SnapTo (hit.transform, hit.point, hit.normal);
-		} else if (hit.collider == null) {
+		/*BoxCollider2D col = this.GetComponent<BoxCollider2D> ();
+		float btm = col.offset.y - (col.size.y / 2f);
+		float left = col.offset.x - (col.size.x / 2f);
+		float right = col.offset.x + (col.size.x / 2f); 
+		Vector3 btmMiddle = transform.TransformPoint (new Vector3 (0f, btm, 0f));
+		Vector3 btmRight = transform.TransformPoint(new Vector3(right, btm, 0f));
+		Vector3 btmLeft = transform.TransformPoint(new Vector3(left, btm, 0f));
+		Debug.DrawRay ((direction == 1 ? btmRight : btmLeft) + transform.up, transform.right * direction, Color.cyan, 3f);
+		RaycastHit2D hit = Physics2D.Raycast(transform.position, -transform.up, 7f, ~(1 << 10));
+		RaycastHit2D hit2 = Physics2D.Raycast((direction == 1 ? btmRight : btmLeft),-transform.up + (transform.right * -direction), 4f, ~(1 << 10));
+		if (hit.collider == null || hit.transform != transform.parent) {
 			if (hit2.collider == null) {	
 				traveled = 0;
 				direction *= -1;
-			} else if (hit2.collider != null && hit2.collider.tag == "Obstacle") {
+			} else if (hit2.collider != null && hit2.collider.tag == "Obstacle" && hit2.transform != transform.parent) {
 				SnapTo (hit2.transform, hit2.point, hit2.normal);
-
 				Debug.DrawRay (hit2.point, hit2.normal, Color.red, 3);
 			}
+		} else if (hit.collider != null && hit.collider.tag == "Obstacle" && hit.transform == this.transform.parent) {
+			if(Vector3.Distance(btmMiddle, new Vector3(hit.point.x,hit.point.y, btmMiddle.z)) > 1f)
+				SnapTo (hit.transform, hit.point, hit.normal);
 		}
-		RaycastHit2D hit3 = Physics2D.Raycast(transform.position, transform.right * direction,2f, ~(1 << 10));
+			//
+		RaycastHit2D hit3 = Physics2D.Raycast((direction == 1 ? btmRight : btmLeft) + transform.up, transform.right * direction, 1f, ~(1 << 10));
 		if (hit3.collider != null && hit3.collider.tag == "Obstacle") {
 			SnapTo (hit3.transform, hit3.point, hit3.normal);
-			Debug.DrawRay (hit2.point, hit2.normal,  Color.green, 3);
-		}
+			Debug.DrawRay (hit3.point, hit3.normal,  Color.green, 3);
+		}*/
 		snapDown = (this.transform.up.y > 0.1f);
 	}
 
