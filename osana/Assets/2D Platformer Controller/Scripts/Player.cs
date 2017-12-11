@@ -82,6 +82,7 @@ public class Player : MonoBehaviour
 
 	public void restart() {
 		this.health = startHealth;
+		this.healthBar.GetComponent<SpriteRenderer> ().enabled = false;
 		this.transform.position = spawnPoint.position;
 		DisplayMessage.ins.clearQueue ();
 		dead = false;
@@ -176,6 +177,7 @@ public class Player : MonoBehaviour
 	}
 
 	public void TakeDamage(int amt, Vector2 dir) {
+		this.healthBar.GetComponent<SpriteRenderer> ().enabled = true;
 		if (!dead) {
 			this.health -= amt;
 			ApplyPush (amt, dir);
