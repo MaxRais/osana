@@ -34,17 +34,14 @@ public class Enemy : MonoBehaviour {
 		// Snap enemy to platform they are on
 		RaycastHit2D hit = Physics2D.Raycast(transform.position, (snapDown ? Vector2.down : Vector2.up), 25f, ~(1 << 10));
 		if (hit.collider != null && hit.collider.tag == "Obstacle") { 
-			SnapTo (hit.transform, hit.point,  hit.normal);
+			SnapTo (hit.point,  hit.normal);
 		}
 	}
 	
 	// Update is called once per frame
 	void Update () {
 		BoxCollider2D col = this.GetComponent<BoxCollider2D> ();
-
-		this.transform.position += transform.right * speed * Time.deltaTime * direction;
-		RaycastHit2D hit = Physics2D.Raycast(transform.position, -transform.up, 3f, ~(1 << 10));
-
+		RaycastHit2D hit = Physics2D.Raycast(transform.position + transform.right * speed * Time.deltaTime * direction, -transform.up, 4f, ~(1 << 10));
 		healthBar.transform.localScale = new Vector3 ((health / maxHealth) , 0.25f, 0.35f);
 		if(shot)
 			shotTimer += Time.deltaTime;
@@ -52,14 +49,12 @@ public class Enemy : MonoBehaviour {
 			shotTimer = 0;
 			shot = false;
 		}
-
 		if ((traveled >= range && range > 0) || hit.collider == null) {
 			traveled = 0;
 			direction *= -1;
-		} else if (hit.collider != null) {
+		} else if (hit.collider != null && hit.collider.tag == "Obstacle") {
 			Debug.DrawRay (hit.point, hit.normal, Color.cyan, 3f);
-			traveled += Vector3.Distance (transform.position, transform.position + transform.right * speed * Time.deltaTime * direction);
-			SnapTo (hit.transform, hit.point, hit.normal);
+			traveled += SnapTo (hit.point, hit.normal);
 		}
 		if (health <= 0) {
 			GameObject manager = GameObject.Find ("GameManager");
@@ -75,13 +70,12 @@ public class Enemy : MonoBehaviour {
 
 	}
 
-	void SnapTo(Transform surface, Vector3 pos, Vector3 normal) {
+	float SnapTo(Vector3 pos, Vector3 normal) {
 		BoxCollider2D col = this.GetComponent<BoxCollider2D> ();
-		transform.parent = null;
+		Vector3 oldPos = transform.position;
 		transform.rotation = Quaternion.FromToRotation (transform.up, normal) * transform.rotation;
-		transform.position = pos + transform.up * col.size.y * 1.2f;
-		transform.localScale = new Vector3 (2.5f, 2.5f, 1);
-		transform.SetParent (surface);
+		transform.position = pos + transform.up * col.size.y;
+		return Vector3.Distance (oldPos, transform.position);
 	}
 
 	void FixedUpdate() {
@@ -118,14 +112,8 @@ public class Enemy : MonoBehaviour {
 
 	void OnCollisionEnter2D(Collision2D col) {
 		if (col.gameObject.tag == "Obstacle") {
-			Rigidbody2D rb = this.GetComponent<Rigidbody2D> ();
-			if (col.relativeVelocity.y > 10) {
-				rb.velocity = Vector2.zero;
-				rb.AddForce (Vector2.up * col.relativeVelocity.y * bounciness);
-			} else if (col.relativeVelocity.y < 10) {
-				rb.gravityScale = 0;
-				rb.velocity = new Vector2 (0, 0);
-			}
+			traveled = 0;
+			direction *= -1;
 		}
 		if (col.gameObject.tag == "Enemy") {
 			direction *= -1;
@@ -179,7 +167,7 @@ public class Enemy : MonoBehaviour {
 		GameObject bullet = Instantiate (bulletPrefab) as GameObject;
 		Bullet script = bullet.GetComponent<Bullet> ();
 		script.speed = bulletSpeed;
-		Vector3 dir = this.transform.position - player.transform.position;
+		Vector3 dir = player.transform.position - this.transform.position;
 		script.direction = direction;
 		script.source = this.gameObject;
 		bullet.transform.position = this.transform.position;
