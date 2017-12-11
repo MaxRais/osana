@@ -89,6 +89,9 @@ public class Player : MonoBehaviour
 	}
 
 	IEnumerator Die() {
+		if (dead)
+			yield break;
+
 		animator.SetBool ("dead", true);
 		dead = true;
 		yield return new WaitForSeconds(3);
