@@ -38,6 +38,7 @@ public class Player : MonoBehaviour
 
 	public AudioClip jumpClip;
 	public AudioClip walkClip;
+	public AudioClip dashClip;
 
     private Vector2 directionalInput;
     private bool wallSliding;
@@ -292,6 +293,7 @@ public class Player : MonoBehaviour
 
 	public void Dash() {
 		if (!dashCooldown) {
+			SoundManager.ins.PlaySingle (dashClip);
 			this.SetDirectionalInput (new Vector2 (dashSpeed * (facingRight ? 1 : -1), directionalInput.y));
 			dashCooldown = true;
 		}

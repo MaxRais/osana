@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class Disease : MonoBehaviour {
 
-	public float dmgDelay;
+	public float dmgDelay = 1f;
 	private float timer;
 	// Use this for initialization
 	void Start () {

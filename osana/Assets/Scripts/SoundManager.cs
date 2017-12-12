@@ -13,7 +13,7 @@ public class SoundManager : MonoBehaviour {
 
 	//Used to play single sound clips.
 	public void PlaySingle(AudioClip clip) {
-		if (clip.name.Contains ("Walking") && efxSource.isPlaying && efxSource.clip.name == clip.name)
+		if (clip.name.Contains ("Walking") && efxSource.isPlaying)
 			return;
 
 		if (clip.name.Contains ("Jump")) {
@@ -21,7 +21,7 @@ public class SoundManager : MonoBehaviour {
 			efxSource.volume = 1.0f;
 		} else {
 			efxSource.pitch = 1.0f;
-			efxSource.volume = 0.5f;
+			efxSource.volume = 0.25f;
 		}
 				
 		//Play the clip
