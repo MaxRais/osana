@@ -27,14 +27,16 @@ public class FollowPlayer : MonoBehaviour {
 	void Update () {
 
 		target = player;
+		float closest = Vector3.Distance(enemyList[0].transform.position, this.transform.position);
 		foreach (GameObject o in enemyList) {
-			if (Vector3.Distance(o.transform.position, this.transform.position) < Vector3.Distance(player.transform.position, this.transform.position)) {
+			if (o != null && Vector3.Distance(o.transform.position, this.transform.position) < Vector3.Distance(player.transform.position, this.transform.position) && Vector3.Distance(o.transform.position, this.transform.position) <= closest) {
 				target = o;
+				closest = Vector3.Distance (o.transform.position, this.transform.position);
 			}
 		}
 
-		transform.LookAt(player.transform);
-		transform.Rotate(new Vector3(0,-90,0),Space.Self);
+		transform.LookAt(target.transform);
+		transform.Rotate(new Vector3(0,-90,0));
 		if (Vector3.Distance (this.transform.position, target.transform.position) < maxDistance && Vector3.Distance (this.transform.position, target.transform.position) > minDistance) {
 			
 			if (!alertedFollow) {
@@ -44,6 +46,7 @@ public class FollowPlayer : MonoBehaviour {
 			//speed = 3f;
 		} else if (Vector3.Distance (this.transform.position, target.transform.position) > maxDistance){
 			alertedFollow = false;
+
 		} else if (Vector3.Distance (this.transform.position, target.transform.position) < minDistance){
 			//speed = 0f;\
 			latched = true;
@@ -52,7 +55,7 @@ public class FollowPlayer : MonoBehaviour {
 			//hit = false;
 			StartCoroutine (eject(target));
 		}
-		if (!latched){
+		if (!latched && alertedFollow){
 			this.transform.Translate (new Vector3 (speed * Time.deltaTime, 0, 0));
 		}
 		/*
@@ -78,23 +81,25 @@ public class FollowPlayer : MonoBehaviour {
 	}
 
 	IEnumerator eject(GameObject target){
-		if (!hit && target.tag != "Enemy"){
-			player.gameObject.GetComponent<Player>().TakeDamage(1, this.gameObject.transform.right);
-			hit = true;
+		if (target != null) {
+			if (!hit && target.tag != "Enemy") {
+				player.gameObject.GetComponent<Player> ().TakeDamage (1, this.gameObject.transform.right);
+				hit = true;
+			}
+			if (!hit && target.tag == "Enemy") {
+				target.gameObject.GetComponent<Enemy> ().TakeDamage (1, this.gameObject.transform.right);
+				hit = true;
+			}
+			yield return new WaitForSeconds (Random.Range (1.75f, 3.5f));
+			this.gameObject.GetComponent<CircleCollider2D> ().enabled = true;
+			this.gameObject.transform.SetParent (null);
+			transform.Translate (new Vector3 (-speed * Time.deltaTime, 0, 0));
+			yield return new WaitForSeconds (Random.Range (3f, 4.5f));
+			transform.LookAt (target.transform);
+			transform.Rotate (new Vector3 (0, -90, 0));
+			latched = false;
+			StartCoroutine (DamageAgain (target));
 		}
-		if (!hit && target.tag == "Enemy"){
-			target.gameObject.GetComponent<Enemy>().TakeDamage(1, this.gameObject.transform.right);
-			hit = true;
-		}
-		yield return new WaitForSeconds (Random.Range(1.75f, 3.5f));
-		this.gameObject.GetComponent<CircleCollider2D>().enabled = true;
-		this.gameObject.transform.SetParent(null);
-		transform.Translate(new Vector3 (-speed * Time.deltaTime, 0, 0));
-		yield return new WaitForSeconds (Random.Range(3f, 4.5f));
-		transform.LookAt(target.transform);
-		transform.Rotate(new Vector3(0,-90,0),Space.Self);
-		latched = false;
-		StartCoroutine(DamageAgain(target));
 	}
 
 	IEnumerator DamageAgain(GameObject target){
