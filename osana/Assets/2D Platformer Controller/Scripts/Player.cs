@@ -89,13 +89,13 @@ public class Player : MonoBehaviour
 		animator.SetBool ("dead", false);
 	}
 
-	IEnumerator Die() {
+	IEnumerator Die(int sec) {
 		if (dead)
 			yield break;
 
 		animator.SetBool ("dead", true);
 		dead = true;
-		yield return new WaitForSeconds(3);
+		yield return new WaitForSeconds(sec);
 		restart();
 	}
 
@@ -188,11 +188,11 @@ public class Player : MonoBehaviour
 	void ApplyPush(int amt, Vector2 dir) {
 		Rigidbody2D rb = this.GetComponent<Rigidbody2D> ();
 		rb.constraints = RigidbodyConstraints2D.FreezeRotation;
-		dir.y += 1f;
+		dir.y += 0.5f;
 		rb.velocity = (dir * amt * 10f);
 	}
 
-	void OnCollisionEnter2D(Collision2D c) {
+	void OnCollisionStay2D(Collision2D c) {
 		if (c.gameObject.tag == "Obstacle") {
 			Rigidbody2D rb = this.GetComponent<Rigidbody2D> ();
 			rb.constraints = (RigidbodyConstraints2D.FreezeRotation | RigidbodyConstraints2D.FreezePositionY);
@@ -201,7 +201,7 @@ public class Player : MonoBehaviour
 		if (c.gameObject.tag == "Crushing") {
 			Vector3 contact = c.contacts [0].point;
 			if ((controller.collisions.below && contact.y > transform.position.y) || (controller.collisions.above && contact.y < transform.position.y))
-				restart ();
+				StartCoroutine (Die (1));
 		}
 	}
 
@@ -246,43 +246,37 @@ public class Player : MonoBehaviour
 
     public void OnJumpInputDown()
     {
-		animator.SetInteger ("xDir", 0);
-		animator.SetBool ("jumping", true);
-        if (wallSliding)
-        {
-            if (wallDirX == directionalInput.x)
-            {
-                velocity.x = -wallDirX * wallJumpClimb.x;
-                velocity.y = wallJumpClimb.y;
-            }
-            else if (directionalInput.x == 0)
-            {
-                velocity.x = -wallDirX * wallJumpOff.x;
-                velocity.y = wallJumpOff.y;
-            }
-            else
-            {
-                velocity.x = -wallDirX * wallLeap.x;
-                velocity.y = wallLeap.y;
-            }
-            isDoubleJumping = false;
-			SoundManager.ins.PlaySingle (jumpClip);
-        }
-        if (controller.collisions.below)
-        {
-			velocity.y = maxJumpVelocity;
-			isJumping = true;
-			isDoubleJumping = false;
-			SoundManager.ins.PlaySingle (jumpClip);
-        }
-        if (canDoubleJump && !controller.collisions.below && !isDoubleJumping && !wallSliding)
-        {
-            velocity.y = maxJumpVelocity;
-            isDoubleJumping = true;
-			animator.SetBool ("jumping", false);
+		if (!dead) {
+			animator.SetInteger ("xDir", 0);
 			animator.SetBool ("jumping", true);
-			SoundManager.ins.PlaySingle (jumpClip);
-        }
+			if (wallSliding) {
+				if (wallDirX == directionalInput.x) {
+					velocity.x = -wallDirX * wallJumpClimb.x;
+					velocity.y = wallJumpClimb.y;
+				} else if (directionalInput.x == 0) {
+					velocity.x = -wallDirX * wallJumpOff.x;
+					velocity.y = wallJumpOff.y;
+				} else {
+					velocity.x = -wallDirX * wallLeap.x;
+					velocity.y = wallLeap.y;
+				}
+				isDoubleJumping = false;
+				SoundManager.ins.PlaySingle (jumpClip);
+			}
+			if (controller.collisions.below) {
+				velocity.y = maxJumpVelocity;
+				isJumping = true;
+				isDoubleJumping = false;
+				SoundManager.ins.PlaySingle (jumpClip);
+			}
+			if (canDoubleJump && !controller.collisions.below && !isDoubleJumping && !wallSliding) {
+				velocity.y = maxJumpVelocity;
+				isDoubleJumping = true;
+				animator.SetBool ("jumping", false);
+				animator.SetBool ("jumping", true);
+				SoundManager.ins.PlaySingle (jumpClip);
+			}
+		}
     }
 
     public void OnJumpInputUp()
@@ -380,7 +374,7 @@ public class Player : MonoBehaviour
 		if (this.transform.position.y < deathMarker.position.y) {
 			restart ();
 		} else if (this.health <= 0) {
-			StartCoroutine (Die ());
+			StartCoroutine (Die (3));
 		}
 	}
 }

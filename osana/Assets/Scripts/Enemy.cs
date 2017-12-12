@@ -54,7 +54,8 @@ public class Enemy : MonoBehaviour {
 			direction *= -1;
 		} else if (hit.collider != null && hit.collider.tag == "Obstacle") {
 			Debug.DrawRay (hit.point, hit.normal, Color.cyan, 3f);
-			traveled += SnapTo (hit.point, hit.normal);
+			traveled += Vector3.Magnitude (transform.right * speed * Time.deltaTime * direction);
+			SnapTo (hit.point, hit.normal);
 		}
 		if (health <= 0) {
 			GameObject manager = GameObject.Find ("GameManager");
@@ -62,20 +63,18 @@ public class Enemy : MonoBehaviour {
 				manager.GetComponent<GameManager> ().AddKill ();
 			Destroy (this.gameObject);
 		}
-		if (Vector3.Distance (transform.position, player.transform.position) <= detectDistance && 
-			Mathf.Sign(direction) == Mathf.Sign(player.transform.position.x - this.transform.position.x)) {
+		if (Vector3.Distance (transform.position, player.transform.position) <= detectDistance) {
 			Debug.Log(this.name + " trying to shoot");
 			shootProjectile ();
 		}
 
 	}
 
-	float SnapTo(Vector3 pos, Vector3 normal) {
+	void SnapTo(Vector3 pos, Vector3 normal) {
 		BoxCollider2D col = this.GetComponent<BoxCollider2D> ();
 		Vector3 oldPos = transform.position;
 		transform.rotation = Quaternion.FromToRotation (transform.up, normal) * transform.rotation;
 		transform.position = pos + transform.up * col.size.y;
-		return Vector3.Distance (oldPos, transform.position);
 	}
 
 	void FixedUpdate() {
