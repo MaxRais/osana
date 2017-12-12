@@ -18,7 +18,9 @@ public class Enemy : MonoBehaviour {
 	public bool snapDown = true;
 	public float dmgBounceback = 2f;
 	public float bounciness = 15f;
-	public float shotDelay = 3f;
+	public float shotDelayMin = 1f;
+	public float shotDelayMax = 3f;
+	private float shotDelay;
 	public int bumpDamage = 1;
 	private float maxHealth;
 	private float shotTimer;
@@ -27,6 +29,7 @@ public class Enemy : MonoBehaviour {
 		maxHealth = health;
 		traveled = 0;
 		direction = 1;
+		shotDelay = Random.Range (shotDelayMin, shotDelayMax);
 		shot = false;
 		this.GetComponent<Rigidbody2D> ().gravityScale = 0;
 		player = GameObject.FindGameObjectWithTag ("Player");
@@ -46,7 +49,6 @@ public class Enemy : MonoBehaviour {
 		if(shot)
 			shotTimer += Time.deltaTime;
 		if (shotTimer >= shotDelay) {
-			shotTimer = 0;
 			shot = false;
 		}
 		if ((traveled >= range && range > 0) || hit.collider == null) {
@@ -174,11 +176,13 @@ public class Enemy : MonoBehaviour {
 	public void shootProjectile () {
 		if (shot)
 			return;
-		Debug.Log (this.name + " firing");
+		//Debug.Log (this.name + " firing");
 		GameObject bullet = Instantiate (bulletPrefab) as GameObject;
 		Bullet script = bullet.GetComponent<Bullet> ();
 		script.speed = bulletSpeed;
 		Vector3 dir = player.transform.position - this.transform.position;
+		if (!snapDown)
+			dir *= -1;
 		script.direction = direction;
 		script.source = this.gameObject;
 		bullet.transform.position = this.transform.position;
@@ -187,5 +191,8 @@ public class Enemy : MonoBehaviour {
 		bullet.transform.rotation = Quaternion.FromToRotation (transform.right * direction, dir) 
 			* bullet.transform.rotation;
 		shot = true;
+
+		shotTimer = 0;
+		shotDelay = Random.Range (shotDelayMin, shotDelayMax);
 	}
 }
