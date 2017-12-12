@@ -21,7 +21,7 @@ public class ChangeHalves : MonoBehaviour {
 			if (player.GetComponent<Player> ().spawnPoint.position.x < endPos.position.x) {
 				player.GetComponent<Player> ().health += 10;
 				player.GetComponent<Player> ().updateSpawnPoint (endPos);
-				DisplayMessage.ins.showMessage ("Checkpoint: HP Restored");
+				DisplayMessage.ins.showMessage ("Checkpoint: HP Restored", 1);
 				DisplayMessage.ins.showMessage ("Muscles contract - avoid being crushed");
 			}
 		} else if (player.transform.position.x > switchPos.position.x) {
@@ -31,7 +31,8 @@ public class ChangeHalves : MonoBehaviour {
 			if (player.GetComponent<Player> ().spawnPoint.position.x < switchPos.position.x) {
 				player.GetComponent<Player> ().updateSpawnPoint (switchPos);
 				player.GetComponent<Player> ().health += 10;
-				DisplayMessage.ins.showMessage ("Checkpoint: HP Restored");
+				DisplayMessage.ins.showMessage ("Checkpoint: HP Restored", 1);
+				DisplayMessage.ins.showMessage ("Crossed joint");
 			}
 		}
 		else if (player.transform.position.x <= switchPos.position.x) {
