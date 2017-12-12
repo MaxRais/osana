@@ -82,7 +82,7 @@ public class Player : MonoBehaviour
 
 	public void restart() {
 		this.health = startHealth;
-		this.healthBar.GetComponent<SpriteRenderer> ().enabled = false;
+		this.healthBar.GetComponent<SpriteRenderer> ().enabled = true;
 		this.transform.position = spawnPoint.position;
 		DisplayMessage.ins.clearQueue ();
 		dead = false;
@@ -93,6 +93,7 @@ public class Player : MonoBehaviour
 		if (dead)
 			yield break;
 
+		this.healthBar.GetComponent<SpriteRenderer> ().enabled = false;
 		animator.SetBool ("dead", true);
 		dead = true;
 		yield return new WaitForSeconds(sec);
