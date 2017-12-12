@@ -36,7 +36,7 @@ public class Enemy : MonoBehaviour {
 
 		// Snap enemy to platform they are on
 		RaycastHit2D hit = Physics2D.Raycast(transform.position, (snapDown ? Vector2.down : Vector2.up), 25f, ~(1 << 10));
-		if (hit.collider != null && hit.collider.tag == "Obstacle") { 
+		if (hit.collider != null && hit.transform.gameObject.layer == LayerMask.NameToLayer("Obstacle")) { 
 			SnapTo (hit.transform, hit.point,  hit.normal);
 		}
 	}
@@ -54,7 +54,7 @@ public class Enemy : MonoBehaviour {
 		if ((traveled >= range && range > 0) || hit.collider == null) {
 			traveled = 0;
 			direction *= -1;
-		} else if (hit.collider != null && hit.collider.tag == "Obstacle") {
+		} else if (hit.collider != null && hit.transform.gameObject.layer == LayerMask.NameToLayer("Obstacle")) {
 			traveled += Vector3.Magnitude (transform.right * speed * Time.deltaTime * direction);
 			SnapTo (hit.transform, hit.point, hit.normal);
 		}
@@ -113,7 +113,7 @@ public class Enemy : MonoBehaviour {
 	}
 
 	void OnCollisionEnter2D(Collision2D col) {
-		if (col.gameObject.tag == "Obstacle") {
+		if (col.gameObject.layer == LayerMask.NameToLayer("Obstacle")) {
 			ContactPoint2D[] contacts = new ContactPoint2D[10];
 			col.GetContacts (contacts);
 			bool tooTall = false;
