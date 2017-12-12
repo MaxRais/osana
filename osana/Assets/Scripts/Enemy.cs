@@ -34,14 +34,14 @@ public class Enemy : MonoBehaviour {
 		// Snap enemy to platform they are on
 		RaycastHit2D hit = Physics2D.Raycast(transform.position, (snapDown ? Vector2.down : Vector2.up), 25f, ~(1 << 10));
 		if (hit.collider != null && hit.collider.tag == "Obstacle") { 
-			SnapTo (hit.point,  hit.normal);
+			SnapTo (hit.transform, hit.point,  hit.normal);
 		}
 	}
 	
 	// Update is called once per frame
 	void Update () {
 		BoxCollider2D col = this.GetComponent<BoxCollider2D> ();
-		RaycastHit2D hit = Physics2D.Raycast(transform.position + transform.right * speed * Time.deltaTime * direction, -transform.up, 4f, ~(1 << 10));
+		RaycastHit2D hit = Physics2D.Raycast(transform.position + transform.right * speed * Time.deltaTime * direction, -transform.up, 6f, ~(1 << 10));
 		healthBar.transform.localScale = new Vector3 ((health / maxHealth) , 0.25f, 0.35f);
 		if(shot)
 			shotTimer += Time.deltaTime;
@@ -53,9 +53,8 @@ public class Enemy : MonoBehaviour {
 			traveled = 0;
 			direction *= -1;
 		} else if (hit.collider != null && hit.collider.tag == "Obstacle") {
-			Debug.DrawRay (hit.point, hit.normal, Color.cyan, 3f);
 			traveled += Vector3.Magnitude (transform.right * speed * Time.deltaTime * direction);
-			SnapTo (hit.point, hit.normal);
+			SnapTo (hit.transform, hit.point, hit.normal);
 		}
 		if (health <= 0) {
 			GameObject manager = GameObject.Find ("GameManager");
@@ -70,11 +69,13 @@ public class Enemy : MonoBehaviour {
 
 	}
 
-	void SnapTo(Vector3 pos, Vector3 normal) {
+	void SnapTo(Transform surface, Vector3 pos, Vector3 normal) {
 		BoxCollider2D col = this.GetComponent<BoxCollider2D> ();
+		transform.parent = null;
 		Vector3 oldPos = transform.position;
 		transform.rotation = Quaternion.FromToRotation (transform.up, normal) * transform.rotation;
 		transform.position = pos + transform.up * col.size.y;
+		transform.SetParent (surface);
 	}
 
 	void FixedUpdate() {
@@ -106,13 +107,24 @@ public class Enemy : MonoBehaviour {
 			SnapTo (hit3.transform, hit3.point, hit3.normal);
 			Debug.DrawRay (hit3.point, hit3.normal,  Color.green, 3);
 		}*/
-		snapDown = (this.transform.up.y > 0.1f);
+		snapDown = (this.transform.up.y > 0f);
 	}
 
 	void OnCollisionEnter2D(Collision2D col) {
 		if (col.gameObject.tag == "Obstacle") {
-			traveled = 0;
-			direction *= -1;
+			ContactPoint2D[] contacts = new ContactPoint2D[10];
+			col.GetContacts (contacts);
+			bool tooTall = false;
+			foreach (ContactPoint2D c in contacts) {
+				Vector3 center = c.collider.bounds.center;
+				if (c.point.y > center.y) {
+					tooTall = snapDown;
+				}
+			}
+			if (tooTall) {
+				traveled = 0;
+				direction *= -1;
+			}
 		}
 		if (col.gameObject.tag == "Enemy") {
 			direction *= -1;

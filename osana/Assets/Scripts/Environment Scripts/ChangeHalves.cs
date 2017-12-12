@@ -18,14 +18,21 @@ public class ChangeHalves : MonoBehaviour {
 		if (player.transform.position.x > endPos.position.x) {
 			leftHalf.GetComponent<BoneRotate> ().enabled = false;
 			rightHalf.GetComponent<BoneRotate> ().enabled = false;
-			if(player.GetComponent<Player>().spawnPoint.position.x < endPos.position.x)
+			if (player.GetComponent<Player> ().spawnPoint.position.x < endPos.position.x) {
+				player.GetComponent<Player> ().health += 10;
 				player.GetComponent<Player> ().updateSpawnPoint (endPos);
+				DisplayMessage.ins.showMessage ("Checkpoint: HP Restored");
+				DisplayMessage.ins.showMessage ("Muscles contract - avoid being crushed");
+			}
 		} else if (player.transform.position.x > switchPos.position.x) {
 			leftHalf.GetComponent<BoneRotate> ().enabled = false;
 			rightHalf.GetComponent<BoneRotate> ().enabled = true;
 			player.GetComponent<Player> ().environment = rightHalf.transform;
-			if(player.GetComponent<Player>().spawnPoint.position.x < switchPos.position.x)
+			if (player.GetComponent<Player> ().spawnPoint.position.x < switchPos.position.x) {
 				player.GetComponent<Player> ().updateSpawnPoint (switchPos);
+				player.GetComponent<Player> ().health += 10;
+				DisplayMessage.ins.showMessage ("Checkpoint: HP Restored");
+			}
 		}
 		else if (player.transform.position.x <= switchPos.position.x) {
 			rightHalf.GetComponent<BoneRotate> ().enabled = false;

@@ -109,6 +109,8 @@ public class Player : MonoBehaviour
 
     private void Update()
 	{
+		if (health > startHealth)
+			health = startHealth;
 		healthBar.transform.localScale = new Vector3 ((health / startHealth) * 3f, 0.25f, 0.35f);
 
 		shotTimer += Time.deltaTime;
