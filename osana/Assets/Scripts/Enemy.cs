@@ -63,7 +63,6 @@ public class Enemy : MonoBehaviour {
 			Destroy (this.gameObject);
 		}
 		if (Vector3.Distance (transform.position, player.transform.position) <= detectDistance) {
-			Debug.Log(this.name + " trying to shoot");
 			shootProjectile ();
 		}
 
@@ -117,7 +116,7 @@ public class Enemy : MonoBehaviour {
 			bool tooTall = false;
 			foreach (ContactPoint2D c in contacts) {
 				Vector3 center = this.GetComponent<Collider2D>().bounds.center;
-				if (c.point.y > center.y) {
+				if (transform.InverseTransformPoint(c.point).y > transform.InverseTransformPoint(center).y && c.point != new Vector2(0,0)) {
 					tooTall = snapDown;
 				}
 			}
