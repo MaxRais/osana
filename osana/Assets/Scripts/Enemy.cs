@@ -117,7 +117,7 @@ public class Enemy : MonoBehaviour {
 			bool tooTall = false;
 			foreach (ContactPoint2D c in contacts) {
 				Vector3 center = this.GetComponent<Collider2D>().bounds.center;
-				if (c.point.y > center.y) {
+				if (transform.InverseTransformPoint(c.point).y > transform.InverseTransformPoint(center).y && c.point != new Vector2(0,0)) {
 					tooTall = snapDown;
 				}
 			}
