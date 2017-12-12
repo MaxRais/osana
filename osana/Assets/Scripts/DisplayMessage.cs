@@ -58,12 +58,9 @@ public class DisplayMessage : MonoBehaviour {
 		}
 		message.text = "";
 		showing = false;
-		while (messageQueue.Count > 0) {
-			Message message1 = messageQueue.Dequeue ();
-			/*if (message.waitTime > messageTimeToLive) {
-				continue;
-			}*/
-			showMessage (message1.text, message1.duration);
+		if (messageQueue.Count > 0) {
+			Message nextMessage = messageQueue.Dequeue ();
+			showMessage (nextMessage.text, nextMessage.duration);
 		}
 	}
 

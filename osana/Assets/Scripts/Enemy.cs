@@ -63,7 +63,7 @@ public class Enemy : MonoBehaviour {
 			Destroy (this.gameObject);
 		}
 		if (Vector3.Distance (transform.position, player.transform.position) <= detectDistance) {
-			Debug.Log(this.name + " trying to shoot");
+			//Debug.Log(this.name + " trying to shoot");
 			shootProjectile ();
 		}
 
