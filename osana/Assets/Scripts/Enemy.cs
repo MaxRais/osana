@@ -182,6 +182,7 @@ public class Enemy : MonoBehaviour {
 		script.direction = direction;
 		script.source = this.gameObject;
 		bullet.transform.position = this.transform.position;
+		bullet.transform.parent = player.GetComponent<Player> ().environment;
 		//bullet.transform.position += Vector3.right * this.transform.localScale.x * direction;
 		bullet.transform.rotation = Quaternion.FromToRotation (transform.right * direction, dir) 
 			* bullet.transform.rotation;
