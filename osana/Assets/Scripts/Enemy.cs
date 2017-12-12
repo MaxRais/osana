@@ -6,26 +6,28 @@ public class Enemy : MonoBehaviour {
 
 	public float range;
 	public float speed;
-	private float traveled;
-	private int direction;
+	protected float traveled;
+	protected int direction;
 	public float detectDistance;
-	private GameObject player;
+	protected GameObject player;
 	public int health;
 	public float bulletSpeed;
 	public GameObject bulletPrefab;
 	public GameObject healthBar;
-	private bool shot;
+	protected bool shot;
 	public bool snapDown = true;
 	public float dmgBounceback = 2f;
 	public float bounciness = 15f;
 	public float shotDelayMin = 1f;
 	public float shotDelayMax = 3f;
-	private float shotDelay;
+	protected float shotDelay;
 	public int bumpDamage = 1;
-	private float maxHealth;
-	private float shotTimer;
+	protected float maxHealth;
+	protected float shotTimer;
+	public LayerMask layerMask;
+
 	// Use this for initialization
-	void Start () {
+	protected virtual void Start () {
 		maxHealth = health;
 		traveled = 0;
 		direction = 1;
@@ -35,16 +37,16 @@ public class Enemy : MonoBehaviour {
 		player = GameObject.FindGameObjectWithTag ("Player");
 
 		// Snap enemy to platform they are on
-		RaycastHit2D hit = Physics2D.Raycast(transform.position, (snapDown ? Vector2.down : Vector2.up), 25f, ~(1 << 10));
+		RaycastHit2D hit = Physics2D.Raycast(transform.position, (snapDown ? Vector2.down : Vector2.up), 25f, layerMask);
 		if (hit.collider != null && hit.collider.tag == "Obstacle") { 
 			SnapTo (hit.transform, hit.point,  hit.normal);
 		}
 	}
 	
 	// Update is called once per frame
-	void Update () {
+	protected virtual void Update () {
 		BoxCollider2D col = this.GetComponent<BoxCollider2D> ();
-		RaycastHit2D hit = Physics2D.Raycast(transform.position + transform.right * speed * Time.deltaTime * direction, -transform.up, 6f, ~(1 << 10));
+		RaycastHit2D hit = Physics2D.Raycast(transform.position + transform.right * speed * Time.deltaTime * direction, -transform.up, 6f, layerMask);
 		healthBar.transform.localScale = new Vector3 ((health / maxHealth) , 0.25f, 0.35f);
 		if(shot)
 			shotTimer += Time.deltaTime;
@@ -68,10 +70,9 @@ public class Enemy : MonoBehaviour {
 			//Debug.Log(this.name + " trying to shoot");
 			shootProjectile ();
 		}
-
 	}
 
-	void SnapTo(Transform surface, Vector3 pos, Vector3 normal) {
+	protected virtual void SnapTo(Transform surface, Vector3 pos, Vector3 normal) {
 		BoxCollider2D col = this.GetComponent<BoxCollider2D> ();
 		transform.parent = null;
 		Vector3 oldPos = transform.position;
@@ -80,7 +81,7 @@ public class Enemy : MonoBehaviour {
 		transform.SetParent (surface);
 	}
 
-	void FixedUpdate() {
+	protected void FixedUpdate() {
 		/*BoxCollider2D col = this.GetComponent<BoxCollider2D> ();
 		float btm = col.offset.y - (col.size.y / 2f);
 		float left = col.offset.x - (col.size.x / 2f);
@@ -112,7 +113,7 @@ public class Enemy : MonoBehaviour {
 		snapDown = (this.transform.up.y > 0f);
 	}
 
-	void OnCollisionEnter2D(Collision2D col) {
+	protected void OnCollisionEnter2D(Collision2D col) {
 		if (col.gameObject.tag == "Obstacle") {
 			ContactPoint2D[] contacts = new ContactPoint2D[10];
 			col.GetContacts (contacts);
@@ -158,7 +159,7 @@ public class Enemy : MonoBehaviour {
 		StartCoroutine (Blink (amt));
 	}
 
-	IEnumerator Blink(int amt) {
+	protected IEnumerator Blink(int amt) {
 		for (int i = 0; i < amt * 2; i++) {
 			if (i % 2 == 0)
 				this.GetComponentInChildren<SpriteRenderer> ().color = Color.red;
@@ -169,7 +170,7 @@ public class Enemy : MonoBehaviour {
 
 	}
 
-	IEnumerator HitPause() {
+	protected IEnumerator HitPause() {
 		yield return new WaitForSeconds(0.75f);
 	}
 
