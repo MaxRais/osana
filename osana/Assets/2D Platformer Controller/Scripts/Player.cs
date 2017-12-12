@@ -89,7 +89,7 @@ public class Player : MonoBehaviour
 		animator.SetBool ("dead", false);
 	}
 
-	IEnumerator Die(int sec) {
+	IEnumerator Die(float sec) {
 		if (dead)
 			yield break;
 
@@ -101,7 +101,7 @@ public class Player : MonoBehaviour
 	}
 
 	public void updateSpawnPoint(Transform newPos) {
-		spawnPoint.position = newPos.position;
+		spawnPoint = newPos;
 	}
 
 	public bool Jumping() {
@@ -123,7 +123,7 @@ public class Player : MonoBehaviour
 		HandleWallSliding ();
 
 		RaycastHit2D hit = Physics2D.Raycast(transform.position, -Vector3.up, 2f, ~(1 << 8));
-		if (hit.collider != null && hit.collider.tag == "Obstacle") {
+		if (hit.collider != null && hit.transform.gameObject.layer == LayerMask.NameToLayer("Obstacle")) {
 			float distanceToGround = hit.distance;
 			if (distanceToGround < 1.23f)
 				transform.Translate (new Vector3 (0, 1.23f - distanceToGround));
@@ -171,7 +171,7 @@ public class Player : MonoBehaviour
 		Rigidbody2D rb = this.GetComponent<Rigidbody2D> ();
 		if (velocity.y < 0) {
 			RaycastHit2D hit = Physics2D.Raycast (transform.position, Vector2.down, 2f, ~(1 << 8));
-			if (hit.collider != null && hit.collider.tag == "Obstacle") {
+			if (hit.collider != null && hit.transform.gameObject.layer == LayerMask.NameToLayer("Obstacle")) {
 				transform.position = hit.point + Vector2.up;
 				rb.constraints = (RigidbodyConstraints2D.FreezeRotation | RigidbodyConstraints2D.FreezePositionY);
 				rb.velocity = new Vector2 (0, 0);
@@ -204,7 +204,7 @@ public class Player : MonoBehaviour
 		if (c.gameObject.tag == "Crushing") {
 			Vector3 contact = c.contacts [0].point;
 			if ((controller.collisions.below && contact.y > transform.position.y) || (controller.collisions.above && contact.y < transform.position.y))
-				StartCoroutine (Die (1));
+				restart ();
 		}
 	}
 
