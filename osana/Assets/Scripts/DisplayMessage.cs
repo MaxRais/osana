@@ -59,11 +59,11 @@ public class DisplayMessage : MonoBehaviour {
 		message.text = "";
 		showing = false;
 		while (messageQueue.Count > 0) {
-			Message message = messageQueue.Dequeue ();
+			Message message1 = messageQueue.Dequeue ();
 			/*if (message.waitTime > messageTimeToLive) {
 				continue;
 			}*/
-			showMessage (message.text, message.duration);
+			showMessage (message1.text, message1.duration);
 		}
 	}
 
