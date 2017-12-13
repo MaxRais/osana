@@ -27,6 +27,8 @@ public class ChangeHalves : MonoBehaviour {
 		} else if (player.transform.position.x > switchPos.position.x) {
 			leftHalf.GetComponent<BoneRotate> ().enabled = false;
 			rightHalf.GetComponent<BoneRotate> ().enabled = true;
+			leftHalf.transform.Find ("BoneMask").gameObject.SetActive (false);
+			rightHalf.transform.Find ("BoneMask").gameObject.SetActive (true);
 			player.GetComponent<Player> ().environment = rightHalf.transform;
 			if (player.GetComponent<Player> ().spawnPoint.position.x < switchPos.position.x) {
 				player.GetComponent<Player> ().updateSpawnPoint (switchPos);
@@ -38,6 +40,8 @@ public class ChangeHalves : MonoBehaviour {
 		else if (player.transform.position.x <= switchPos.position.x) {
 			rightHalf.GetComponent<BoneRotate> ().enabled = false;
 			leftHalf.GetComponent<BoneRotate> ().enabled = true;
+			leftHalf.transform.Find ("BoneMask").gameObject.SetActive (true);
+			rightHalf.transform.Find ("BoneMask").gameObject.SetActive (false);
 			player.GetComponent<Player> ().environment = leftHalf.transform;
 		}
 
