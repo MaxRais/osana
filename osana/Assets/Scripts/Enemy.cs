@@ -6,56 +6,59 @@ public class Enemy : MonoBehaviour {
 
 	public float range;
 	public float speed;
-	private float traveled;
-	private int direction;
+	protected float traveled;
+	protected int direction;
 	public float detectDistance;
-	private GameObject player;
+	protected GameObject player;
 	public int health;
 	public float bulletSpeed;
 	public GameObject bulletPrefab;
 	public GameObject healthBar;
-	private bool shot;
+	protected bool shot;
 	public bool snapDown = true;
 	public float dmgBounceback = 2f;
 	public float bounciness = 15f;
-	public float shotDelay = 3f;
+	public float shotDelayMin = 1f;
+	public float shotDelayMax = 3f;
+	protected float shotDelay;
 	public int bumpDamage = 1;
-	private float maxHealth;
-	private float shotTimer;
+	protected float maxHealth;
+	protected float shotTimer;
+	public LayerMask layerMask;
+
 	// Use this for initialization
-	void Start () {
+	protected virtual void Start () {
 		maxHealth = health;
 		traveled = 0;
 		direction = 1;
+		shotDelay = Random.Range (shotDelayMin, shotDelayMax);
 		shot = false;
 		this.GetComponent<Rigidbody2D> ().gravityScale = 0;
 		player = GameObject.FindGameObjectWithTag ("Player");
 
 		// Snap enemy to platform they are on
-		RaycastHit2D hit = Physics2D.Raycast(transform.position, (snapDown ? Vector2.down : Vector2.up), 25f, ~(1 << 10));
+		RaycastHit2D hit = Physics2D.Raycast(transform.position, (snapDown ? Vector2.down : Vector2.up), 25f, layerMask);
 		if (hit.collider != null && hit.collider.tag == "Obstacle") { 
-			SnapTo (hit.point,  hit.normal);
+			SnapTo (hit.transform, hit.point,  hit.normal);
 		}
 	}
 	
 	// Update is called once per frame
-	void Update () {
+	protected virtual void Update () {
 		BoxCollider2D col = this.GetComponent<BoxCollider2D> ();
-		RaycastHit2D hit = Physics2D.Raycast(transform.position + transform.right * speed * Time.deltaTime * direction, -transform.up, 4f, ~(1 << 10));
+		RaycastHit2D hit = Physics2D.Raycast(transform.position + transform.right * speed * Time.deltaTime * direction, -transform.up, 6f, layerMask);
 		healthBar.transform.localScale = new Vector3 ((health / maxHealth) , 0.25f, 0.35f);
 		if(shot)
 			shotTimer += Time.deltaTime;
 		if (shotTimer >= shotDelay) {
-			shotTimer = 0;
 			shot = false;
 		}
 		if ((traveled >= range && range > 0) || hit.collider == null) {
 			traveled = 0;
 			direction *= -1;
-		} else if (hit.collider != null && hit.collider.tag == "Obstacle") {
-			Debug.DrawRay (hit.point, hit.normal, Color.cyan, 3f);
+		} else if (hit.collider != null && hit.transform.gameObject.layer == LayerMask.NameToLayer("Obstacle")) {
 			traveled += Vector3.Magnitude (transform.right * speed * Time.deltaTime * direction);
-			SnapTo (hit.point, hit.normal);
+			SnapTo (hit.transform, hit.point, hit.normal);
 		}
 		if (health <= 0) {
 			GameObject manager = GameObject.Find ("GameManager");
@@ -64,20 +67,21 @@ public class Enemy : MonoBehaviour {
 			Destroy (this.gameObject);
 		}
 		if (Vector3.Distance (transform.position, player.transform.position) <= detectDistance) {
-			Debug.Log(this.name + " trying to shoot");
+			//Debug.Log(this.name + " trying to shoot");
 			shootProjectile ();
 		}
-
 	}
 
-	void SnapTo(Vector3 pos, Vector3 normal) {
+	protected virtual void SnapTo(Transform surface, Vector3 pos, Vector3 normal) {
 		BoxCollider2D col = this.GetComponent<BoxCollider2D> ();
+		transform.parent = null;
 		Vector3 oldPos = transform.position;
 		transform.rotation = Quaternion.FromToRotation (transform.up, normal) * transform.rotation;
 		transform.position = pos + transform.up * col.size.y;
+		transform.SetParent (surface);
 	}
 
-	void FixedUpdate() {
+	protected void FixedUpdate() {
 		/*BoxCollider2D col = this.GetComponent<BoxCollider2D> ();
 		float btm = col.offset.y - (col.size.y / 2f);
 		float left = col.offset.x - (col.size.x / 2f);
@@ -106,13 +110,24 @@ public class Enemy : MonoBehaviour {
 			SnapTo (hit3.transform, hit3.point, hit3.normal);
 			Debug.DrawRay (hit3.point, hit3.normal,  Color.green, 3);
 		}*/
-		snapDown = (this.transform.up.y > 0.1f);
+		snapDown = (this.transform.up.y > 0f);
 	}
 
-	void OnCollisionEnter2D(Collision2D col) {
-		if (col.gameObject.tag == "Obstacle") {
-			traveled = 0;
-			direction *= -1;
+	protected void OnCollisionEnter2D(Collision2D col) {
+		if (col.gameObject.layer == LayerMask.NameToLayer("Obstacle")) {
+			ContactPoint2D[] contacts = new ContactPoint2D[10];
+			col.GetContacts (contacts);
+			bool tooTall = false;
+			foreach (ContactPoint2D c in contacts) {
+				Vector3 center = this.GetComponent<Collider2D>().bounds.center;
+				if (transform.InverseTransformPoint(c.point).y > transform.InverseTransformPoint(center).y && c.point != new Vector2(0,0)) {
+					tooTall = snapDown;
+				}
+			}
+			if (tooTall) {
+				traveled = 0;
+				direction *= -1;
+			}
 		}
 		if (col.gameObject.tag == "Enemy") {
 			direction *= -1;
@@ -144,7 +159,7 @@ public class Enemy : MonoBehaviour {
 		StartCoroutine (Blink (amt));
 	}
 
-	IEnumerator Blink(int amt) {
+	protected IEnumerator Blink(int amt) {
 		for (int i = 0; i < amt * 2; i++) {
 			if (i % 2 == 0)
 				this.GetComponentInChildren<SpriteRenderer> ().color = Color.red;
@@ -155,24 +170,30 @@ public class Enemy : MonoBehaviour {
 
 	}
 
-	IEnumerator HitPause() {
+	protected IEnumerator HitPause() {
 		yield return new WaitForSeconds(0.75f);
 	}
 
 	public void shootProjectile () {
 		if (shot)
 			return;
-		Debug.Log (this.name + " firing");
+		//Debug.Log (this.name + " firing");
 		GameObject bullet = Instantiate (bulletPrefab) as GameObject;
 		Bullet script = bullet.GetComponent<Bullet> ();
 		script.speed = bulletSpeed;
 		Vector3 dir = player.transform.position - this.transform.position;
+		if (!snapDown)
+			dir *= -1;
 		script.direction = direction;
 		script.source = this.gameObject;
 		bullet.transform.position = this.transform.position;
+		bullet.transform.parent = player.GetComponent<Player> ().environment;
 		//bullet.transform.position += Vector3.right * this.transform.localScale.x * direction;
 		bullet.transform.rotation = Quaternion.FromToRotation (transform.right * direction, dir) 
 			* bullet.transform.rotation;
 		shot = true;
+
+		shotTimer = 0;
+		shotDelay = Random.Range (shotDelayMin, shotDelayMax);
 	}
 }

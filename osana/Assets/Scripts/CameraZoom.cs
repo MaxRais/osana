@@ -72,7 +72,7 @@ public class CameraZoom : MonoBehaviour {
 	// Update is called once per frame
 	void Update () {
 		if (cam && levelStarted) {
-			if (Input.GetKey (KeyCode.Z)) {
+			if (Input.GetButton("Fire3")) {
 				if (zoomingIn) {
 					stopZoom = true;
 				}

@@ -38,6 +38,7 @@ public class Player : MonoBehaviour
 
 	public AudioClip jumpClip;
 	public AudioClip walkClip;
+	public AudioClip dashClip;
 
     private Vector2 directionalInput;
     private bool wallSliding;
@@ -82,17 +83,18 @@ public class Player : MonoBehaviour
 
 	public void restart() {
 		this.health = startHealth;
-		this.healthBar.GetComponent<SpriteRenderer> ().enabled = false;
+		this.healthBar.GetComponent<SpriteRenderer> ().enabled = true;
 		this.transform.position = spawnPoint.position;
 		DisplayMessage.ins.clearQueue ();
 		dead = false;
 		animator.SetBool ("dead", false);
 	}
 
-	IEnumerator Die(int sec) {
+	IEnumerator Die(float sec) {
 		if (dead)
 			yield break;
 
+		this.healthBar.GetComponent<SpriteRenderer> ().enabled = false;
 		animator.SetBool ("dead", true);
 		dead = true;
 		yield return new WaitForSeconds(sec);
@@ -100,7 +102,7 @@ public class Player : MonoBehaviour
 	}
 
 	public void updateSpawnPoint(Transform newPos) {
-		spawnPoint.position = newPos.position;
+		spawnPoint = newPos;
 	}
 
 	public bool Jumping() {
@@ -109,6 +111,8 @@ public class Player : MonoBehaviour
 
     private void Update()
 	{
+		if (health > startHealth)
+			health = startHealth;
 		healthBar.transform.localScale = new Vector3 ((health / startHealth) * 3f, 0.25f, 0.35f);
 
 		shotTimer += Time.deltaTime;
@@ -120,7 +124,7 @@ public class Player : MonoBehaviour
 		HandleWallSliding ();
 
 		RaycastHit2D hit = Physics2D.Raycast(transform.position, -Vector3.up, 2f, ~(1 << 8));
-		if (hit.collider != null && hit.collider.tag == "Obstacle") {
+		if (hit.collider != null && hit.transform.gameObject.layer == LayerMask.NameToLayer("Obstacle")) {
 			float distanceToGround = hit.distance;
 			if (distanceToGround < 1.23f)
 				transform.Translate (new Vector3 (0, 1.23f - distanceToGround));
@@ -168,7 +172,7 @@ public class Player : MonoBehaviour
 		Rigidbody2D rb = this.GetComponent<Rigidbody2D> ();
 		if (velocity.y < 0) {
 			RaycastHit2D hit = Physics2D.Raycast (transform.position, Vector2.down, 2f, ~(1 << 8));
-			if (hit.collider != null && hit.collider.tag == "Obstacle") {
+			if (hit.collider != null && hit.transform.gameObject.layer == LayerMask.NameToLayer("Obstacle")) {
 				transform.position = hit.point + Vector2.up;
 				rb.constraints = (RigidbodyConstraints2D.FreezeRotation | RigidbodyConstraints2D.FreezePositionY);
 				rb.velocity = new Vector2 (0, 0);
@@ -201,7 +205,7 @@ public class Player : MonoBehaviour
 		if (c.gameObject.tag == "Crushing") {
 			Vector3 contact = c.contacts [0].point;
 			if ((controller.collisions.below && contact.y > transform.position.y) || (controller.collisions.above && contact.y < transform.position.y))
-				StartCoroutine (Die (1));
+				restart ();
 		}
 	}
 
@@ -289,6 +293,7 @@ public class Player : MonoBehaviour
 
 	public void Dash() {
 		if (!dashCooldown) {
+			SoundManager.ins.PlaySingle (dashClip);
 			this.SetDirectionalInput (new Vector2 (dashSpeed * (facingRight ? 1 : -1), directionalInput.y));
 			dashCooldown = true;
 		}
