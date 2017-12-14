@@ -22,6 +22,9 @@ public class FollowPlayer : MonoBehaviour {
 		player = GameObject.Find("Player");
 		forces = new float[]{-100, 100};
 		enemyList = GameObject.FindGameObjectsWithTag ("Enemy");
+		returnPoint = new GameObject ();
+		returnPoint.transform.position = transform.position;
+		returnPoint.transform.SetParent (transform.parent);
 	}
 	
 	// Update is called once per frame
