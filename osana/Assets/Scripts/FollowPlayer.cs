@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class FollowPlayer : MonoBehaviour {
 	public GameObject player; 
+	public GameObject returnPoint;
 	public float speed;
 	public float maxDistance;
 	public float minDistance;
@@ -42,10 +43,15 @@ public class FollowPlayer : MonoBehaviour {
 			if (!alertedFollow) {
 				//DisplayMessage.ins.showMessage ("you are being followed");
 				alertedFollow = true;
+
 			}
 			//speed = 3f;
 		} else if (Vector3.Distance (this.transform.position, target.transform.position) > maxDistance){
 			alertedFollow = false;
+			transform.LookAt(returnPoint.transform.position - this.transform.position);
+			transform.Rotate(new Vector3(0,-90,0));
+			this.transform.Translate (new Vector3 (speed * Time.deltaTime, 0, 0));
+
 
 		} else if (Vector3.Distance (this.transform.position, target.transform.position) < minDistance){
 			//speed = 0f;\
