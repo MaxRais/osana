@@ -53,7 +53,6 @@ public class Enemy : MonoBehaviour {
 		Vector3 btmRight = transform.TransformPoint(new Vector3(right, btm, 0f));
 		Vector3 btmLeft = transform.TransformPoint(new Vector3(left, btm, 0f));
 		RaycastHit2D hit = Physics2D.Raycast(transform.position + transform.right * speed * Time.deltaTime * direction, -transform.up, 3f, layerMask);
-		Debug.DrawRay (transform.position + transform.right * speed * Time.deltaTime * direction, -transform.up, Color.red, 3f);
 		healthBar.transform.localScale = new Vector3 ((health / maxHealth) , 0.25f, 0.35f);
 		if(shot)
 			shotTimer += Time.deltaTime;
