@@ -46,7 +46,14 @@ public class Enemy : MonoBehaviour {
 	// Update is called once per frame
 	protected virtual void Update () {
 		BoxCollider2D col = this.GetComponent<BoxCollider2D> ();
-		RaycastHit2D hit = Physics2D.Raycast(transform.position + transform.right * speed * Time.deltaTime * direction, -transform.up, 6f, layerMask);
+		float btm = col.offset.y - (col.size.y / 2f);
+		float left = col.offset.x - (col.size.x / 2f);
+		float right = col.offset.x + (col.size.x / 2f); 
+		Vector3 btmMiddle = transform.TransformPoint (new Vector3 (0f, btm, 0f));
+		Vector3 btmRight = transform.TransformPoint(new Vector3(right, btm, 0f));
+		Vector3 btmLeft = transform.TransformPoint(new Vector3(left, btm, 0f));
+		RaycastHit2D hit = Physics2D.Raycast(transform.position + transform.right * speed * Time.deltaTime * direction, -transform.up, 3f, layerMask);
+		Debug.DrawRay (transform.position + transform.right * speed * Time.deltaTime * direction, -transform.up, Color.red, 3f);
 		healthBar.transform.localScale = new Vector3 ((health / maxHealth) , 0.25f, 0.35f);
 		if(shot)
 			shotTimer += Time.deltaTime;
@@ -57,8 +64,13 @@ public class Enemy : MonoBehaviour {
 			traveled = 0;
 			direction *= -1;
 		} else if (hit.collider != null && hit.transform.gameObject.layer == LayerMask.NameToLayer("Obstacle")) {
-			traveled += Vector3.Magnitude (transform.right * speed * Time.deltaTime * direction);
-			SnapTo (hit.transform, hit.point, hit.normal);
+			RaycastHit2D hit3 = Physics2D.Raycast((direction == 1 ? btmRight : btmLeft) + transform.up, transform.right * direction, 1f, ~(1 << 10));
+			if (hit3.collider != null && hit3.collider.tag == "Obstacle") {
+				SnapTo (hit3.transform, hit3.point, hit3.normal);
+			} else {
+				traveled += Vector3.Magnitude (transform.right * speed * Time.deltaTime * direction);
+				SnapTo (hit.transform, hit.point, hit.normal);
+			}
 		}
 		if (health <= 0) {
 			GameObject manager = GameObject.Find ("GameManager");
@@ -71,11 +83,9 @@ public class Enemy : MonoBehaviour {
 			shootProjectile ();
 		}
 	}
-
 	protected virtual void SnapTo(Transform surface, Vector3 pos, Vector3 normal) {
 		BoxCollider2D col = this.GetComponent<BoxCollider2D> ();
 		transform.parent = null;
-		Vector3 oldPos = transform.position;
 		transform.rotation = Quaternion.FromToRotation (transform.up, normal) * transform.rotation;
 		transform.position = pos + transform.up * col.size.y;
 		transform.SetParent (surface);
@@ -118,6 +128,7 @@ public class Enemy : MonoBehaviour {
 			ContactPoint2D[] contacts = new ContactPoint2D[10];
 			col.GetContacts (contacts);
 			bool tooTall = false;
+			int index = 0;
 			foreach (ContactPoint2D c in contacts) {
 				Vector3 center = this.GetComponent<Collider2D>().bounds.center;
 				if (transform.InverseTransformPoint(c.point).y > transform.InverseTransformPoint(center).y && c.point != new Vector2(0,0)) {
