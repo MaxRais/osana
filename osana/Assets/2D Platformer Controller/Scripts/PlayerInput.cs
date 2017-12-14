@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.SceneManagement;
 
 [RequireComponent(typeof(Player))]
 public class PlayerInput : MonoBehaviour
@@ -37,5 +38,7 @@ public class PlayerInput : MonoBehaviour
 		{
 			player.SetDirectionalInput (Vector2.zero);
 		}
+		if (Input.GetButtonDown ("Start"))
+			SceneManager.LoadScene ("Menu");
     }
 }
