@@ -10,6 +10,17 @@ public class BoneRotate : MonoBehaviour {
 	void Start () {
 		pauseSecs = 0;
 		pausing = true;
+		foreach (Transform t in transform) {
+			if(t.name.Contains("whitebloodcell"))
+				t.GetComponent<FollowPlayer>().enabled = true;
+		}
+	}
+
+	void OnDisable() {
+		foreach (Transform t in transform) {
+			if(t.name.Contains("whitebloodcell"))
+				t.GetComponent<FollowPlayer>().enabled = false;
+		}
 	}
 
 	// Update is called once per frame

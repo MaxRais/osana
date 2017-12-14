@@ -21,6 +21,9 @@ public class ChangeHalves : MonoBehaviour {
 			rightHalf.GetComponent<BoneRotate> ().enabled = false;
 			rightHalf.transform.Find ("BoneMask").gameObject.SetActive (false);
 			muscle.transform.Find ("MuscleMask").gameObject.SetActive (true);
+			foreach(Transform t in muscle.transform)
+				if(t.name.Contains("whitebloodcell"))
+					t.GetComponent<FollowPlayer>().enabled = true;
 			if (player.GetComponent<Player> ().spawnPoint.position.x < endPos.position.x) {
 				player.GetComponent<Player> ().health += 10;
 				player.GetComponent<Player> ().updateSpawnPoint (endPos);
@@ -47,6 +50,9 @@ public class ChangeHalves : MonoBehaviour {
 			player.GetComponent<Player> ().environment = leftHalf.transform;
 		} if (player.transform.position.x < endPos.position.x) {
 			muscle.transform.Find ("MuscleMask").gameObject.SetActive (false);
+			foreach(Transform t in muscle.transform)
+				if(t.name.Contains("whitebloodcell"))
+					t.GetComponent<FollowPlayer>().enabled = false;
 		}
 	}
 }
