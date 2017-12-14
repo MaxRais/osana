@@ -63,7 +63,7 @@ public class Enemy : MonoBehaviour {
 			traveled = 0;
 			direction *= -1;
 		} else if (hit.collider != null && hit.transform.gameObject.layer == LayerMask.NameToLayer("Obstacle")) {
-			RaycastHit2D hit3 = Physics2D.Raycast((direction == 1 ? btmRight : btmLeft) + transform.up , transform.right * direction, 0.75f, ~(1 << 10));
+			RaycastHit2D hit3 = Physics2D.Raycast((direction == 1 ? btmRight : btmLeft) + (transform.up / 2f) , transform.right * direction, 0.3f, ~(1 << 10));
 			if (hit3.collider != null && hit3.collider.tag == "Obstacle") {
 				SnapTo (hit3.transform, hit3.point, hit3.normal);
 			} else {

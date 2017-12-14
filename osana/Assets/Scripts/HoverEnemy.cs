@@ -46,7 +46,7 @@ public class HoverEnemy : Enemy {
 
 	protected override void SnapTo(Transform surface, Vector3 pos, Vector3 normal) {
 		BoxCollider2D col = this.GetComponent<BoxCollider2D> ();
-		transform.parent = null;
+		//transform.parent = null;
 		Vector3 oldPos = transform.position;
 		//transform.position = pos + transform.up * col.size.y + Vector3.up * minHoverHeight;
 		Vector3 endPosition = pos + transform.up * col.size.y + Vector3.up * minHoverHeight;
