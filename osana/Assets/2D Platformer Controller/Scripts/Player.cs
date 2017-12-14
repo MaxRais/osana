@@ -39,6 +39,7 @@ public class Player : MonoBehaviour
 	public AudioClip jumpClip;
 	public AudioClip walkClip;
 	public AudioClip dashClip;
+	public AudioClip shootClip;
 
     private Vector2 directionalInput;
     private bool wallSliding;
@@ -303,6 +304,8 @@ public class Player : MonoBehaviour
 	{
 		if (shot)
 			return;
+
+		SoundManager.ins.PlaySingle (shootClip);
 		GameObject bullet = Instantiate (bulletPrefab) as GameObject;
 		bullet.transform.position = this.transform.position;
 		Vector2 dir = new Vector2 (0f, 0f);

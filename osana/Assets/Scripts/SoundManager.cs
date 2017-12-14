@@ -19,6 +19,9 @@ public class SoundManager : MonoBehaviour {
 		if (clip.name.Contains ("Jump")) {
 			efxSource.pitch = 1.6f;
 			efxSource.volume = 1.0f;
+		} else if(clip.name.Contains("shoot")) {
+			efxSource.pitch = 1.0f;
+			efxSource.volume = 0.05f;
 		} else {
 			efxSource.pitch = 1.0f;
 			efxSource.volume = 0.25f;
