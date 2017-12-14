@@ -17,6 +17,7 @@ public class FollowPlayer : MonoBehaviour {
 	private float[] forces;
 	private GameObject[] enemyList;
 	private GameObject target;
+	private Transform mapParent;
 	// Use this for initialization
 	void Start () {
 		player = GameObject.Find("Player");
@@ -25,6 +26,7 @@ public class FollowPlayer : MonoBehaviour {
 		returnPoint = new GameObject ();
 		returnPoint.transform.position = transform.position;
 		returnPoint.transform.SetParent (transform.parent);
+		mapParent = this.transform.parent;
 	}
 	
 	// Update is called once per frame
@@ -101,7 +103,7 @@ public class FollowPlayer : MonoBehaviour {
 			}
 			yield return new WaitForSeconds (Random.Range (1.75f, 3.5f));
 			this.gameObject.GetComponent<CircleCollider2D> ().enabled = true;
-			this.gameObject.transform.SetParent (null);
+			this.gameObject.transform.SetParent (mapParent);
 			transform.Translate (new Vector3 (-speed * Time.deltaTime, 0, 0));
 			yield return new WaitForSeconds (Random.Range (3f, 4.5f));
 			transform.LookAt (target.transform);
