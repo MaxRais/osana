@@ -63,12 +63,17 @@ public class Enemy : MonoBehaviour {
 			traveled = 0;
 			direction *= -1;
 		} else if (hit.collider != null && hit.transform.gameObject.layer == LayerMask.NameToLayer("Obstacle")) {
-			RaycastHit2D hit3 = Physics2D.Raycast((direction == 1 ? btmRight : btmLeft) + transform.up, transform.right * direction, 1f, ~(1 << 10));
+			RaycastHit2D hit3 = Physics2D.Raycast((direction == 1 ? btmRight : btmLeft) + transform.up , transform.right * direction, 0.75f, ~(1 << 10));
 			if (hit3.collider != null && hit3.collider.tag == "Obstacle") {
 				SnapTo (hit3.transform, hit3.point, hit3.normal);
 			} else {
-				traveled += Vector3.Magnitude (transform.right * speed * Time.deltaTime * direction);
-				SnapTo (hit.transform, hit.point, hit.normal);
+				float diff = (hit.collider.offset.y + (hit.transform.gameObject.GetComponent<BoxCollider2D>().size.y / 2f)) - hit.transform.InverseTransformPoint (hit.point).y;
+				if(!snapDown)
+					diff = (hit.collider.offset.y - (hit.transform.gameObject.GetComponent<BoxCollider2D>().size.y / 2f)) - hit.transform.InverseTransformPoint (hit.point).y;
+				if (diff < 0.001) {
+					traveled += Vector3.Magnitude (transform.right * speed * Time.deltaTime * direction);
+					SnapTo (hit.transform, hit.point, hit.normal);
+				}
 			}
 		}
 		if (health <= 0) {
@@ -84,10 +89,10 @@ public class Enemy : MonoBehaviour {
 	}
 	protected virtual void SnapTo(Transform surface, Vector3 pos, Vector3 normal) {
 		BoxCollider2D col = this.GetComponent<BoxCollider2D> ();
-		transform.parent = null;
+		//transform.parent = null;
 		transform.rotation = Quaternion.FromToRotation (transform.up, normal) * transform.rotation;
 		transform.position = pos + transform.up * col.size.y;
-		transform.SetParent (surface);
+		//transform.SetParent (surface);
 	}
 
 	protected void FixedUpdate() {
@@ -130,7 +135,7 @@ public class Enemy : MonoBehaviour {
 			int index = 0;
 			foreach (ContactPoint2D c in contacts) {
 				Vector3 center = this.GetComponent<Collider2D>().bounds.center;
-				if (transform.InverseTransformPoint(c.point).y > transform.InverseTransformPoint(center).y && c.point != new Vector2(0,0)) {
+				if (transform.InverseTransformPoint (c.point).y > transform.InverseTransformPoint (center).y && c.point != new Vector2 (0, 0)) {
 					tooTall = snapDown;
 				}
 			}
