@@ -121,4 +121,9 @@ public class FollowPlayer : MonoBehaviour {
 
 
 	}
+
+	public void ResetParent() {
+		transform.SetParent (mapParent);
+	}
+
 }

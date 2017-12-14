@@ -77,6 +77,9 @@ public class Enemy : MonoBehaviour {
 			}
 		}
 		if (health <= 0) {
+			foreach (Transform t in transform)
+				if (t.name.Contains ("whitebloodcell"))
+					t.GetComponent<FollowPlayer> ().ResetParent ();
 			GameObject manager = GameObject.Find ("GameManager");
 			if(manager)
 				manager.GetComponent<GameManager> ().AddKill ();
