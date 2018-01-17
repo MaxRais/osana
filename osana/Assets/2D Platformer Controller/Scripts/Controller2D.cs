@@ -9,6 +9,7 @@ public class Controller2D : RaycastController
     public CollisionInfo collisions;
     [HideInInspector]
     public Vector2 playerInput;
+	public GameObject platform;
 
     public override void Start()
     {
@@ -16,6 +17,15 @@ public class Controller2D : RaycastController
 
         collisions.faceDir = 1;
     }
+
+	public void OnCollisionEnter2D(Collision2D col) {
+		if(collisions.below) {
+			if (platform && platform.GetComponent<PlatformAudio>()) {
+				platform.GetComponent<PlatformAudio> ().stopSound ();
+			}
+			platform = col.gameObject;
+		}
+	}
 
     public void Move(Vector2 moveAmount, bool standingOnPlatform = false)
     {

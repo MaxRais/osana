@@ -36,10 +36,10 @@ public class Player : MonoBehaviour
     private Controller2D controller;
 	private Animator animator;
 
+	public AudioSource sfx;
 	public AudioClip jumpClip;
 	public AudioClip walkClip;
 	public AudioClip dashClip;
-	public AudioClip shootClip;
 
     private Vector2 directionalInput;
     private bool wallSliding;
@@ -225,19 +225,17 @@ public class Player : MonoBehaviour
     {
         directionalInput = input;
 		if (input.x == -1 && !dead) {
-			//this.gameObject.transform.GetChild (0).GetComponent<SpriteRenderer> ().sprite = osanaLeft;
 			facingRight = false;
 			if (controller.collisions.below) {
 				animator.SetInteger ("xDir", -1);
-				SoundManager.ins.PlaySingle (walkClip);
+				playWalkSound();
 			}
 			this.transform.localScale = new Vector3 (-1, 1, 1);
 		} else if (input.x == 1 && !dead) {
-			//this.gameObject.transform.GetChild (0).GetComponent<SpriteRenderer> ().sprite = osanaRight;
 			facingRight = true;
 			if (controller.collisions.below) {
 				animator.SetInteger ("xDir", 1);
-				SoundManager.ins.PlaySingle (walkClip);
+				playWalkSound();
 			}
 			this.transform.localScale = Vector3.one;
 		} else if (input.y == 1) {
@@ -266,20 +264,20 @@ public class Player : MonoBehaviour
 					velocity.y = wallLeap.y;
 				}
 				isDoubleJumping = false;
-				SoundManager.ins.PlaySingle (jumpClip);
+				playJumpSound();
 			}
 			if (controller.collisions.below) {
 				velocity.y = maxJumpVelocity;
 				isJumping = true;
 				isDoubleJumping = false;
-				SoundManager.ins.PlaySingle (jumpClip);
+				playJumpSound ();
 			}
 			if (canDoubleJump && !controller.collisions.below && !isDoubleJumping && !wallSliding) {
 				velocity.y = maxJumpVelocity;
 				isDoubleJumping = true;
 				animator.SetBool ("jumping", false);
 				animator.SetBool ("jumping", true);
-				SoundManager.ins.PlaySingle (jumpClip);
+				playJumpSound ();
 			}
 		}
     }
@@ -294,7 +292,7 @@ public class Player : MonoBehaviour
 
 	public void Dash() {
 		if (!dashCooldown) {
-			SoundManager.ins.PlaySingle (dashClip);
+			playDashSound();
 			this.SetDirectionalInput (new Vector2 (dashSpeed * (facingRight ? 1 : -1), directionalInput.y));
 			dashCooldown = true;
 		}
@@ -305,7 +303,6 @@ public class Player : MonoBehaviour
 		if (shot)
 			return;
 
-		SoundManager.ins.PlaySingle (shootClip);
 		GameObject bullet = Instantiate (bulletPrefab) as GameObject;
 		bullet.transform.position = this.transform.position;
 		Vector2 dir = new Vector2 (0f, 0f);
@@ -383,6 +380,27 @@ public class Player : MonoBehaviour
 			restart ();
 		} else if (this.health <= 0) {
 			StartCoroutine (Die (3));
+		}
+	}
+
+	private void playJumpSound() {
+		sfx.pitch = 1.6f;
+		sfx.volume = 1.0f;
+		sfx.clip = jumpClip;
+		sfx.Play ();
+	}
+
+	private void playDashSound() {
+		sfx.pitch = 1.0f;
+		sfx.volume = 0.25f;
+		sfx.clip = dashClip;
+		sfx.Play ();
+	}
+
+	private void playWalkSound() {
+		PlatformAudio p = controller.platform.GetComponent<PlatformAudio>();
+		if (p) {
+			controller.platform.GetComponent<PlatformAudio>().playWalkSound();
 		}
 	}
 }

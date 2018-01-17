@@ -10,6 +10,12 @@ public class SoundManager : MonoBehaviour {
 		ins = this;
 	}
 
+	/*
+	 * Get rid of sound manager
+	 * give every clip its own unique source
+	 * one for bullet, one for platform walking
+	 * osana is for jumping and dashing
+	 */
 
 	//Used to play single sound clips.
 	public void PlaySingle(AudioClip clip) {
