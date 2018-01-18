@@ -21,6 +21,7 @@ public class Player : MonoBehaviour
 	private bool isJumping = false;
     private bool isDoubleJumping = false;
 	private bool facingRight = true;
+	public bool sliding = false;
 	private float xScale;
 
     public float wallSlideSpeedMax = 3f;
@@ -73,7 +74,7 @@ public class Player : MonoBehaviour
 		dashTimer = 0;
 		recharge = GameObject.Find ("RechargeBar");
         controller = GetComponent<Controller2D>();
-		animator = this.gameObject.transform.GetChild (0).GetComponent<Animator> ();
+		animator = this.GetComponent<Animator> ();
         gravity = -(2 * maxJumpHeight) / Mathf.Pow(timeToJumpApex, 2);
         maxJumpVelocity = Mathf.Abs(gravity) * timeToJumpApex;
         minJumpVelocity = Mathf.Sqrt(2 * Mathf.Abs(gravity) * minJumpHeight);
@@ -127,8 +128,6 @@ public class Player : MonoBehaviour
 		RaycastHit2D hit = Physics2D.Raycast(transform.position, -Vector3.up, 2f, ~(1 << 8));
 		if (hit.collider != null && hit.transform.gameObject.layer == LayerMask.NameToLayer("Obstacle")) {
 			float distanceToGround = hit.distance;
-			if (distanceToGround < 1.23f)
-				transform.Translate (new Vector3 (0, 1.23f - distanceToGround));
 		}
 		if (controller.collisions.below && isJumping && velocity.y < 0) {
 			isJumping = false;
@@ -226,25 +225,24 @@ public class Player : MonoBehaviour
         directionalInput = input;
 		if (input.x == -1 && !dead) {
 			facingRight = false;
+			animator.SetInteger ("xDir", -1);
 			if (controller.collisions.below) {
-				animator.SetInteger ("xDir", -1);
+				this.GetComponent<SpriteRenderer> ().flipX = true;
 				playWalkSound();
 			}
-			this.transform.localScale = new Vector3 (-1, 1, 1);
 		} else if (input.x == 1 && !dead) {
 			facingRight = true;
+			animator.SetInteger ("xDir", 1);
 			if (controller.collisions.below) {
-				animator.SetInteger ("xDir", 1);
+				this.GetComponent<SpriteRenderer> ().flipX = false;
 				playWalkSound();
 			}
-			this.transform.localScale = Vector3.one;
-		} else if (input.y == 1) {
-			//Debug.Log ("Up");
-		} else if (input.y == -1) {
-			//Debug.Log ("down");
+		} else if (input.y < 0) {
+			sliding = true;
 		} else if (input.x == 0) {
 			animator.SetInteger ("xDir", 0);
 		}
+		animator.SetBool ("sliding", sliding);
     }
 
     public void OnJumpInputDown()
