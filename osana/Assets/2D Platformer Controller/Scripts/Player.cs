@@ -237,8 +237,6 @@ public class Player : MonoBehaviour
 				this.GetComponent<SpriteRenderer> ().flipX = false;
 				playWalkSound();
 			}
-		} else if (input.y < 0) {
-			sliding = true;
 		} else if (input.x == 0) {
 			animator.SetInteger ("xDir", 0);
 		}
@@ -295,7 +293,13 @@ public class Player : MonoBehaviour
 			dashCooldown = true;
 		}
 	}
-
+	public void Slide() {
+		if (!sliding && directionalInput.x != 0) {
+			this.SetDirectionalInput (new Vector2 (5 * (facingRight ? 1 : -1), directionalInput.y));
+			sliding = true;
+			animator.SetBool ("sliding", sliding);
+		}
+	}
 	public void ShootProjectile()
 	{
 		if (shot)
