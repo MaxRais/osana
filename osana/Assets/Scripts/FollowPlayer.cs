@@ -106,6 +106,9 @@ public class FollowPlayer : MonoBehaviour {
 			this.gameObject.transform.SetParent (mapParent);
 			transform.Translate (new Vector3 (-speed * Time.deltaTime, 0, 0));
 			yield return new WaitForSeconds (Random.Range (3f, 4.5f));
+			if (target == null) {
+				yield break;
+			}
 			transform.LookAt (target.transform);
 			transform.Rotate (new Vector3 (0, -90, 0));
 			latched = false;
