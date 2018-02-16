@@ -37,7 +37,11 @@ public class HoverEnemy : Enemy {
 			GameObject manager = GameObject.Find ("GameManager");
 			if(manager)
 				manager.GetComponent<GameManager> ().AddKill ();
-			Destroy (this.gameObject);
+			if (dead) {
+				return;
+			}
+			dead = true;
+			StartCoroutine (Die ());
 		}
 		if (Vector3.Distance (transform.position, player.transform.position) <= detectDistance) {
 			shootProjectile ();

@@ -25,6 +25,8 @@ public class Enemy : MonoBehaviour {
 	protected float maxHealth;
 	protected float shotTimer;
 	public LayerMask layerMask;
+	public AudioClip deathSound;
+	protected bool dead;
 
 	// Use this for initialization
 	protected virtual void Start () {
@@ -83,7 +85,11 @@ public class Enemy : MonoBehaviour {
 			GameObject manager = GameObject.Find ("GameManager");
 			if(manager)
 				manager.GetComponent<GameManager> ().AddKill ();
-			Destroy (this.gameObject);
+			if (dead) {
+				return;
+			}
+			dead = true;
+			StartCoroutine (Die ());
 		}
 		if (Vector3.Distance (transform.position, player.transform.position) <= detectDistance) {
 			//Debug.Log(this.name + " trying to shoot");
@@ -96,6 +102,30 @@ public class Enemy : MonoBehaviour {
 		transform.rotation = Quaternion.FromToRotation (transform.up, normal) * transform.rotation;
 		transform.position = pos + transform.up * col.size.y;
 		//transform.SetParent (surface);
+	}
+
+	protected IEnumerator Die() {
+		this.speed = 0;
+		this.detectDistance = 0;
+		AudioSource player = this.GetComponent<AudioSource> ();
+		player.Stop ();
+		player.clip = deathSound;
+		player.loop = false;
+		player.volume = 1;
+		player.Play ();
+		while (player.isPlaying) {
+			foreach (Transform t in transform)
+				if (t.name.Contains ("whitebloodcell"))
+					t.GetComponent<FollowPlayer> ().ResetParent ();
+			
+			Vector3 scale = this.transform.localScale;
+			scale -= Vector3.one * Time.deltaTime;
+			if (scale.x < 0)
+				scale = Vector3.zero;
+			this.transform.localScale = scale;
+			yield return null;
+		}
+		Destroy (this.gameObject);
 	}
 
 	protected void FixedUpdate() {
