@@ -220,8 +220,6 @@ public class Player : MonoBehaviour
 			dir.x = dir.x * bounceDist;
 			dir.y = bounceHeight;
 			velocity = dir;
-
-			Debug.Log (dir.x + " " + dir.y);
 		}
 	}
 
