@@ -198,7 +198,7 @@ public class Player : MonoBehaviour
 	}
 
 	void OnCollisionStay2D(Collision2D c) {
-		if (c.gameObject.tag == "Obstacle") {
+		if (c.gameObject.tag == "Obstacle" || c.gameObject.tag == "Bounce") {
 			Rigidbody2D rb = this.GetComponent<Rigidbody2D> ();
 			rb.constraints = (RigidbodyConstraints2D.FreezeRotation | RigidbodyConstraints2D.FreezePositionY);
 			rb.velocity = new Vector2 (0, 0);
@@ -210,8 +210,8 @@ public class Player : MonoBehaviour
 		}
 	}
 	void OnCollisionEnter2D(Collision2D c) {
-		if (c.gameObject.tag == "Bounce" && isJumping || isDoubleJumping) {
-			this.velocity.y = bounceHeight;
+		if (c.gameObject.tag == "Bounce" && (isJumping || isDoubleJumping)) {
+			velocity.y = bounceHeight;
 		}
 	}
 
