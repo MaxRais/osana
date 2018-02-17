@@ -174,10 +174,10 @@ public class Player : MonoBehaviour
 		Rigidbody2D rb = this.GetComponent<Rigidbody2D> ();
 		if (velocity.y < 0) {
 			RaycastHit2D hit = Physics2D.Raycast (transform.position, Vector2.down, 2f, ~(1 << 8));
-			if (hit.collider != null && hit.transform.gameObject.layer == LayerMask.NameToLayer("Obstacle")) {
-				transform.position = hit.point + Vector2.up;
-				rb.constraints = (RigidbodyConstraints2D.FreezeRotation | RigidbodyConstraints2D.FreezePositionY);
-				rb.velocity = new Vector2 (0, 0);
+			if (hit.collider != null && hit.transform.gameObject.tag == "Obstacle") {
+				//transform.position = hit.point + Vector2.up;
+				//rb.constraints = (RigidbodyConstraints2D.FreezeRotation | RigidbodyConstraints2D.FreezePositionY);
+				//rb.velocity = new Vector2 (0, 0);
 			}
 		}
 	}
@@ -211,7 +211,7 @@ public class Player : MonoBehaviour
 		}
 	}
 	void OnCollisionEnter2D(Collision2D c) {
-		if (c.gameObject.tag == "Bounce" && (isJumping || isDoubleJumping)) {
+		if (c.gameObject.tag == "Bounce") {
 			isDoubleJumping = false;
 			isJumping = true;
 			Vector2 dir = c.contacts [0].point - new Vector2 (transform.position.x, transform.position.y);
@@ -220,6 +220,8 @@ public class Player : MonoBehaviour
 			dir.x = dir.x * bounceDist;
 			dir.y = bounceHeight;
 			velocity = dir;
+
+			Debug.Log (dir.x + " " + dir.y);
 		}
 	}
 
