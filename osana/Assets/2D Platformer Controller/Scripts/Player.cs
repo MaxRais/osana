@@ -66,6 +66,7 @@ public class Player : MonoBehaviour
 	private GameObject recharge;
 	public GameObject healthBar;
 	public float bounceHeight;
+	public float bounceDist;
 
     private void Start()
     {
@@ -198,7 +199,7 @@ public class Player : MonoBehaviour
 	}
 
 	void OnCollisionStay2D(Collision2D c) {
-		if (c.gameObject.tag == "Obstacle" || c.gameObject.tag == "Bounce") {
+		if (c.gameObject.tag == "Obstacle") {
 			Rigidbody2D rb = this.GetComponent<Rigidbody2D> ();
 			rb.constraints = (RigidbodyConstraints2D.FreezeRotation | RigidbodyConstraints2D.FreezePositionY);
 			rb.velocity = new Vector2 (0, 0);
@@ -211,7 +212,12 @@ public class Player : MonoBehaviour
 	}
 	void OnCollisionEnter2D(Collision2D c) {
 		if (c.gameObject.tag == "Bounce" && (isJumping || isDoubleJumping)) {
-			velocity.y = bounceHeight;
+			Vector2 dir = c.contacts [0].point - new Vector2 (transform.position.x, transform.position.y);
+			dir = -dir.normalized;
+
+			dir.x = dir.x * bounceDist;
+			dir.y = bounceHeight;
+			velocity = dir;
 		}
 	}
 
