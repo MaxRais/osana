@@ -212,6 +212,8 @@ public class Player : MonoBehaviour
 	}
 	void OnCollisionEnter2D(Collision2D c) {
 		if (c.gameObject.tag == "Bounce" && (isJumping || isDoubleJumping)) {
+			isDoubleJumping = false;
+			isJumping = true;
 			Vector2 dir = c.contacts [0].point - new Vector2 (transform.position.x, transform.position.y);
 			dir = -dir.normalized;
 
