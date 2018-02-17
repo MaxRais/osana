@@ -65,6 +65,7 @@ public class Player : MonoBehaviour
 	private float dashTimer;
 	private GameObject recharge;
 	public GameObject healthBar;
+	public float bounceHeight;
 
     private void Start()
     {
@@ -206,6 +207,11 @@ public class Player : MonoBehaviour
 			Vector3 contact = c.contacts [0].point;
 			if ((controller.collisions.below && contact.y > transform.position.y) || (controller.collisions.above && contact.y < transform.position.y))
 				restart ();
+		}
+	}
+	void OnCollisionEnter2D(Collision2D c) {
+		if (c.gameObject.tag == "Bounce" && isJumping || isDoubleJumping) {
+			this.velocity.y = bounceHeight;
 		}
 	}
 
