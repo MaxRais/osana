@@ -89,6 +89,13 @@ public class Player : MonoBehaviour
 		this.health = startHealth;
 		this.healthBar.GetComponent<SpriteRenderer> ().enabled = true;
 		this.transform.position = spawnPoint.position;
+		foreach (GameObject wbc in GameObject.FindGameObjectsWithTag("WBC")) {
+			FollowPlayer fb = wbc.GetComponent<FollowPlayer> ();
+			wbc.transform.position = fb.startPos;
+			fb.StopCoroutines ();
+			fb.ResetParent ();
+		}
+
 		DisplayMessage.ins.clearQueue ();
 		dead = false;
 		animator.SetBool ("dead", false);
