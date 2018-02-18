@@ -247,15 +247,15 @@ public class Player : MonoBehaviour
 		if (input.x == -1 && !dead) {
 			facingRight = false;
 			animator.SetInteger ("xDir", -1);
+			this.GetComponent<SpriteRenderer> ().flipX = true;
 			if (controller.collisions.below) {
-				this.GetComponent<SpriteRenderer> ().flipX = true;
 				playWalkSound();
 			}
 		} else if (input.x == 1 && !dead) {
 			facingRight = true;
 			animator.SetInteger ("xDir", 1);
+			this.GetComponent<SpriteRenderer> ().flipX = false;
 			if (controller.collisions.below) {
-				this.GetComponent<SpriteRenderer> ().flipX = false;
 				playWalkSound();
 			}
 		} else if (input.x == 0) {

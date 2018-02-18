@@ -68,7 +68,7 @@ public class Enemy : MonoBehaviour {
 			RaycastHit2D hit3 = Physics2D.Raycast((direction == 1 ? btmRight : btmLeft) + (transform.up / 2f) , transform.right * direction, 0.3f, ~(1 << 10));
 			if (hit3.collider != null && hit3.collider.tag == "Obstacle") {
 				SnapTo (hit3.transform, hit3.point, hit3.normal);
-			} else {
+			} /*else {
 				float diff = (hit.collider.offset.y + (hit.transform.gameObject.GetComponent<BoxCollider2D>().size.y / 2f)) - hit.transform.InverseTransformPoint (hit.point).y;
 				if(!snapDown)
 					diff = (hit.collider.offset.y - (hit.transform.gameObject.GetComponent<BoxCollider2D>().size.y / 2f)) - hit.transform.InverseTransformPoint (hit.point).y;
@@ -76,7 +76,7 @@ public class Enemy : MonoBehaviour {
 					traveled += Vector3.Magnitude (transform.right * speed * Time.deltaTime * direction);
 					SnapTo (hit.transform, hit.point, hit.normal);
 				}
-			}
+			}*/
 		}
 		if (health <= 0) {
 			foreach (Transform t in transform)
