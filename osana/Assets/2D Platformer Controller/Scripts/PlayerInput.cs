@@ -38,7 +38,7 @@ public class PlayerInput : MonoBehaviour
 		{
 			player.Slide ();
 		}
-		if (Input.GetButton("Fire3") || Input.GetButton("Fire4"))
+		if (Input.GetButton("Fire4"))
 		{
 			player.SetDirectionalInput (Vector2.zero);
 		}
