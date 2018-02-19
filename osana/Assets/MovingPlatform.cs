@@ -10,6 +10,8 @@ public class MovingPlatform : MonoBehaviour {
 	public float speed = 1f;
 	public float stopSecs = 0;
 	private bool up, right, moving;
+	private float xTraveled = 0;
+	private float yTraveled = 0;
 	private GameObject passenger;
 	// Use this for initialization
 	void Start () {
@@ -34,7 +36,7 @@ public class MovingPlatform : MonoBehaviour {
 	// Update is called once per frame
 	void Update () {
 		if (moving) {
-			if (right && Mathf.Abs (transform.position.x - startPos.x) < horizontalMovement) {
+			if (right && xTraveled < horizontalMovement) {
 				transform.Translate (new Vector3 (speed * Time.deltaTime, 0, 0));
 				if(passenger)
 					passenger.transform.Translate (new Vector3 (speed * Time.deltaTime, 0, 0));

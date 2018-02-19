@@ -27,6 +27,7 @@ public class Enemy : MonoBehaviour {
 	public LayerMask layerMask;
 	public AudioClip deathSound;
 	protected bool dead;
+	private Rigidbody2D rb;
 
 	// Use this for initialization
 	protected virtual void Start () {
@@ -37,11 +38,12 @@ public class Enemy : MonoBehaviour {
 		shot = false;
 		this.GetComponent<Rigidbody2D> ().gravityScale = 0;
 		player = GameObject.FindGameObjectWithTag ("Player");
+		rb = this.GetComponent<Rigidbody2D> ();
 
 		// Snap enemy to platform they are on
 		RaycastHit2D hit = Physics2D.Raycast(transform.position, (snapDown ? Vector2.down : Vector2.up), 25f, layerMask);
 		if (hit.collider != null && hit.collider.tag == "Obstacle") { 
-			SnapTo (hit.transform, hit.point, hit.normal);
+			SnapTo (hit.transform, hit.point, hit.transform.position - transform.position);
 		}
 	}
 	
@@ -54,6 +56,7 @@ public class Enemy : MonoBehaviour {
 		Vector3 btmMiddle = transform.TransformPoint (new Vector3 (0f, btm, 0f));
 		Vector3 btmRight = transform.TransformPoint(new Vector3(right, btm, 0f));
 		Vector3 btmLeft = transform.TransformPoint(new Vector3(left, btm, 0f));
+		//Debug.DrawRay (transform.position + transform.right * speed * Time.deltaTime * direction, -transform.up,  Color.red, 2f);
 		RaycastHit2D hit = Physics2D.Raycast(transform.position + transform.right * speed * Time.deltaTime * direction, -transform.up, 3f, layerMask);
 		healthBar.transform.localScale = new Vector3 ((health / maxHealth) , 0.25f, 0.35f);
 		if(shot)
@@ -67,10 +70,13 @@ public class Enemy : MonoBehaviour {
 		} else if (hit.collider != null && hit.transform.gameObject.layer == LayerMask.NameToLayer("Obstacle")) {
 			RaycastHit2D hit3 = Physics2D.Raycast((direction == 1 ? btmRight : btmLeft) + (transform.up / 2f) , transform.right * direction, 0.3f, layerMask);
 			if (hit3.collider != null && hit3.collider.tag == "Obstacle") {
-				SnapTo (hit3.transform, hit3.point, hit3.normal);
+				SnapTo (hit3.transform, hit3.point, hit3.transform.position - transform.position);
 			} else {
-				SnapTo (hit.transform, hit.point, hit.normal);
+				SnapTo (hit.transform, hit.point, hit.transform.position - transform.position);
 			}
+			Vector2 v = rb.velocity;
+			v.x = -transform.right.x * speed;
+			rb.velocity = v;
 			/*else {
 				float diff = (hit.collider.offset.y + (hit.transform.gameObject.GetComponent<BoxCollider2D>().size.y / 2f)) - hit.transform.InverseTransformPoint (hit.point).y;
 				if(!snapDown)
@@ -88,11 +94,13 @@ public class Enemy : MonoBehaviour {
 		}
 	}
 
-	protected virtual void SnapTo(Transform surface, Vector3 pos, Vector3 normal) {
+	protected virtual void SnapTo(Transform surface, Vector3 pos, Vector3 norm) {
 		BoxCollider2D col = this.GetComponent<BoxCollider2D> ();
 		//transform.parent = null;
-		transform.rotation = Quaternion.FromToRotation (transform.up, normal) * transform.rotation;
-		transform.position = pos + transform.up * col.size.y;
+		//transform.Rotate(0, 0, (snapDown ? norm.y : -norm.y), Space.World);
+		rb.MoveRotation (norm.y);
+		//transform.rotation = Quaternion.FromToRotation (transform.up, normal) * transform.rotation;
+		transform.position = pos + (snapDown ? transform.up  : -transform.up) * col.size.y;
 		//transform.SetParent (surface);
 	}
 

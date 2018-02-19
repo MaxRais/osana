@@ -45,7 +45,7 @@ public class ChangeHalves : MonoBehaviour {
 			rightHalf.transform.Find ("BoneMask").gameObject.SetActive (true);
 			muscle.transform.Find ("MuscleMask").gameObject.SetActive (false);
 			player.GetComponent<Player> ().environment = rightHalf.transform;
-			player.GetComponent<Player> ().updateSpawnPoint (endPos);
+			//player.GetComponent<Player> ().updateSpawnPoint (endPos);
 			if (!alertedBoneChange1) {
 				player.GetComponent<Player> ().health += 10;
 				DisplayMessage.ins.showMessage ("Checkpoint. HP Restored", 1);
@@ -59,7 +59,7 @@ public class ChangeHalves : MonoBehaviour {
 			rightHalf.transform.Find ("BoneMask").gameObject.SetActive (false);
 			muscle.transform.Find ("MuscleMask").gameObject.SetActive (false);
 			player.GetComponent<Player> ().environment = leftHalf.transform;
-			player.GetComponent<Player> ().updateSpawnPoint (switchPos);
+			//player.GetComponent<Player> ().updateSpawnPoint (switchPos);
 			if (!alertedBoneChange2) {
 				player.GetComponent<Player> ().health += 10;
 				DisplayMessage.ins.showMessage ("Checkpoint. HP Restored", 1);
