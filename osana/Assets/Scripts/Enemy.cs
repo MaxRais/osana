@@ -215,11 +215,14 @@ public class Enemy : MonoBehaviour {
 		RaycastHit2D hit = Physics2D.Raycast (transform.position + transform.right * direction, (snapDown ? -Vector2.up : Vector2.up), col.size.y + 1, layerMask);
 		RaycastHit2D hit2 = Physics2D.Raycast (transform.position, transform.right * direction, col.size.x + 1, layerMask);
 		if (hit.collider != null && hit.collider.tag == "Obstacle" && Mathf.Abs (hit.normal.x) > 0.1f) {
-			Debug.Log ("Fixing Sliding");
 			rb.velocity = new Vector2 (rb.velocity.x - (hit.normal.x), rb.velocity.y);
 			Vector3 pos = transform.position;
 			pos.y += -hit.normal.x * Mathf.Abs (rb.velocity.x) * Time.deltaTime * (rb.velocity.x - hit.normal.x > 0 ? 1 : -1);
 			transform.position = pos;
+		}
+
+		if (hit.collider == null && hit2.collider != null) {
+			SnapTo (hit2.transform, hit2.point, hit2.normal);
 		}
 		if (hit.collider == null || hit2.collider != null) {
 			traveled = 0;
@@ -232,8 +235,10 @@ public class Enemy : MonoBehaviour {
 		} else {
 			this.GetComponent<Rigidbody2D> ().gravityScale = -9.8f;
 		}
-
-		rb.velocity = platform.right * direction * speed;
+		if (platform)
+			rb.velocity = platform.right * direction * speed;
+		else
+			rb.velocity = transform.right * direction * speed;
 
 	}
 
