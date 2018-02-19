@@ -22,7 +22,6 @@ public class TendonMusicChange : MonoBehaviour {
 	void OnTriggerEnter2D(Collider2D col) {
 		StopAllCoroutines ();
 		if (col.name == "Player") {
-			Debug.Log ("enter");
 			StartCoroutine (fade (true));
 		}
 	}
@@ -30,7 +29,6 @@ public class TendonMusicChange : MonoBehaviour {
 	void OnTriggerExit2D(Collider2D col) {
 		StopAllCoroutines ();
 		if (col.name == "Player") {
-			Debug.Log ("exit");
 			if (col.transform.position.x < this.transform.position.x) {
 				player.clip = muscle;
 			} else {

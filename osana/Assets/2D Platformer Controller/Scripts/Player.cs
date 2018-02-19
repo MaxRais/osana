@@ -33,6 +33,7 @@ public class Player : MonoBehaviour
     private float minJumpVelocity;
     private Vector3 velocity;
     private float velocityXSmoothing;
+	public LayerMask layerMask;
 
     private Controller2D controller;
 	private Animator animator;
@@ -134,8 +135,8 @@ public class Player : MonoBehaviour
 		CalculateVelocity ();
 		HandleWallSliding ();
 
-		RaycastHit2D hit = Physics2D.Raycast(transform.position, -Vector3.up, 2f, ~(1 << 8));
-		if (hit.collider != null && hit.transform.gameObject.layer == LayerMask.NameToLayer("Obstacle")) {
+		RaycastHit2D hit = Physics2D.Raycast(transform.position, -Vector3.up, 2f, layerMask);
+		if (hit.collider != null && hit.transform.gameObject.layer == LayerMask.NameToLayer ("Obstacle")) {
 			float distanceToGround = hit.distance;
 		}
 		if (controller.collisions.below && isJumping && velocity.y < 0) {
@@ -180,7 +181,7 @@ public class Player : MonoBehaviour
 	void FixedUpdate() {
 		Rigidbody2D rb = this.GetComponent<Rigidbody2D> ();
 		if (velocity.y < 0) {
-			RaycastHit2D hit = Physics2D.Raycast (transform.position, Vector2.down, 2f, ~(1 << 8));
+			RaycastHit2D hit = Physics2D.Raycast (transform.position, Vector2.down, 2f, layerMask);
 			if (hit.collider != null && hit.transform.gameObject.tag == "Obstacle") {
 				//transform.position = hit.point + Vector2.up;
 				//rb.constraints = (RigidbodyConstraints2D.FreezeRotation | RigidbodyConstraints2D.FreezePositionY);

@@ -33,16 +33,7 @@ public class HoverEnemy : Enemy {
 			traveled += Vector3.Magnitude (transform.right * speed * Time.deltaTime * direction);
 			SnapTo (hit.transform, hit.point, hit.normal);
 		}
-		if (health <= 0) {
-			GameObject manager = GameObject.Find ("GameManager");
-			if(manager)
-				manager.GetComponent<GameManager> ().AddKill ();
-			if (dead) {
-				return;
-			}
-			dead = true;
-			StartCoroutine (Die ());
-		}
+		checkForDeath ();
 		if (Vector3.Distance (transform.position, player.transform.position) <= detectDistance) {
 			shootProjectile ();
 		}
