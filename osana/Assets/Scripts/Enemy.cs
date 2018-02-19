@@ -141,7 +141,7 @@ public class Enemy : MonoBehaviour {
 	}
 
 	protected virtual void SnapTo(Transform surface, Vector3 pos, Vector3 norm) {
-		Debug.DrawRay (pos, norm, Color.green, 1f);
+		//Debug.DrawRay (pos, norm, Color.green, 1f);
 		BoxCollider2D col = this.GetComponent<BoxCollider2D> ();
 		//transform.parent = null;
 		platform = surface;
@@ -211,7 +211,7 @@ public class Enemy : MonoBehaviour {
 
 		RaycastHit2D hit = Physics2D.Raycast (transform.position + (snapDown ? transform.right * direction : -transform.right * direction), (snapDown ? -Vector2.up : Vector2.up), col.size.y + 3, layerMask);
 		RaycastHit2D hit2 = Physics2D.Raycast (transform.position, transform.right * direction, col.size.x + 1, layerMask);
-		Debug.DrawRay (transform.position + (snapDown ? transform.right * direction : -transform.right * direction), (snapDown ? -Vector2.up : Vector2.up), Color.red, 1f);
+		//Debug.DrawRay (transform.position + (snapDown ? transform.right * direction : -transform.right * direction), (snapDown ? -Vector2.up : Vector2.up), Color.red, 1f);
 		if (hit.collider != null && hit.collider.tag == "Obstacle" && Mathf.Abs (hit.normal.x) > 0.1f) {
 			rb.velocity = new Vector2 (rb.velocity.x - (hit.normal.x), rb.velocity.y);
 			Vector3 pos = transform.position;
