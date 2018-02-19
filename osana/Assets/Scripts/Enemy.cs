@@ -141,20 +141,19 @@ public class Enemy : MonoBehaviour {
 	}
 
 	protected virtual void SnapTo(Transform surface, Vector3 pos, Vector3 norm) {
-
-			Debug.DrawRay (pos, norm, Color.green, 1f);
-			BoxCollider2D col = this.GetComponent<BoxCollider2D> ();
-			//transform.parent = null;
-			platform = surface;
-			Quaternion rotAmt = (Quaternion.FromToRotation (transform.up, norm));
-			//targetRot = rotAmt;
-			//Debug.Log(gameObject.name + " : " + rotAmt.z);
-			rotating = true;
-			snapDown = (norm.y > 0);
-			targetRot = (snapDown ? new Quaternion (0, 0, 0, 0) : new Quaternion (0, 0, 180, 0));
-			//transform.rotation = Quaternion.FromToRotation (transform.up, norm) * transform.rotation;
-			transform.position = pos + norm * col.size.y;
-			//transform.SetParent (surface);
+		Debug.DrawRay (pos, norm, Color.green, 1f);
+		BoxCollider2D col = this.GetComponent<BoxCollider2D> ();
+		//transform.parent = null;
+		platform = surface;
+		Quaternion rotAmt = (Quaternion.FromToRotation (transform.up, norm));
+		//targetRot = rotAmt;
+		//Debug.Log(gameObject.name + " : " + rotAmt.z);
+		rotating = true;
+		snapDown = (norm.y > 0);
+		targetRot = (snapDown ? new Quaternion (0, 0, 0, 0) : new Quaternion (0, 0, 180, 0));
+		//transform.rotation = Quaternion.FromToRotation (transform.up, norm) * transform.rotation;
+		targetPos = pos + norm * col.size.y;
+		//transform.SetParent (surface);
 	}
 
 	protected void checkForDeath() {
@@ -240,7 +239,7 @@ public class Enemy : MonoBehaviour {
 		if (platform)
 			rb.velocity = platform.right * direction * speed;
 		else
-			rb.velocity = transform.right * direction * speed;
+			rb.velocity = (targetPos - transform.position) * direction * speed;
 		traveled += Vector3.Magnitude (transform.right * speed * Time.deltaTime * direction);
 		transform.rotation = Quaternion.Lerp (transform.rotation, targetRot, Time.deltaTime * rotSpeed);
 
