@@ -23,6 +23,7 @@ public class Player : MonoBehaviour
 	private bool facingRight = true;
 	public bool sliding = false;
 	private float xScale;
+	private bool bounced = false;
 
     public float wallSlideSpeedMax = 3f;
     public float wallStickTime = .25f;
@@ -228,6 +229,11 @@ public class Player : MonoBehaviour
 			dir.x = dir.x * bounceDist;
 			dir.y = bounceHeight;
 			velocity = dir;
+
+			if (!bounced) {
+				DisplayMessage.ins.showMessage ("These alveoli are bouncy.");
+				bounced = true;
+			}
 		}
 	}
 
