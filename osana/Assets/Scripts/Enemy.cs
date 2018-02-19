@@ -41,7 +41,7 @@ public class Enemy : MonoBehaviour {
 		// Snap enemy to platform they are on
 		RaycastHit2D hit = Physics2D.Raycast(transform.position, (snapDown ? Vector2.down : Vector2.up), 25f, layerMask);
 		if (hit.collider != null && hit.collider.tag == "Obstacle") { 
-			SnapTo (hit.transform, hit.point,  hit.normal);
+			SnapTo (hit.transform, hit.point, hit.normal);
 		}
 	}
 	
@@ -65,10 +65,13 @@ public class Enemy : MonoBehaviour {
 			traveled = 0;
 			direction *= -1;
 		} else if (hit.collider != null && hit.transform.gameObject.layer == LayerMask.NameToLayer("Obstacle")) {
-			RaycastHit2D hit3 = Physics2D.Raycast((direction == 1 ? btmRight : btmLeft) + (transform.up / 2f) , transform.right * direction, 0.3f, ~(1 << 10));
+			RaycastHit2D hit3 = Physics2D.Raycast((direction == 1 ? btmRight : btmLeft) + (transform.up / 2f) , transform.right * direction, 0.3f, layerMask);
 			if (hit3.collider != null && hit3.collider.tag == "Obstacle") {
 				SnapTo (hit3.transform, hit3.point, hit3.normal);
-			} /*else {
+			} else {
+				SnapTo (hit.transform, hit.point, hit.normal);
+			}
+			/*else {
 				float diff = (hit.collider.offset.y + (hit.transform.gameObject.GetComponent<BoxCollider2D>().size.y / 2f)) - hit.transform.InverseTransformPoint (hit.point).y;
 				if(!snapDown)
 					diff = (hit.collider.offset.y - (hit.transform.gameObject.GetComponent<BoxCollider2D>().size.y / 2f)) - hit.transform.InverseTransformPoint (hit.point).y;
@@ -78,6 +81,22 @@ public class Enemy : MonoBehaviour {
 				}
 			}*/
 		}
+		checkForDeath ();
+		if (Vector3.Distance (transform.position, player.transform.position) <= detectDistance) {
+			//Debug.Log(this.name + " trying to shoot");
+			shootProjectile ();
+		}
+	}
+
+	protected virtual void SnapTo(Transform surface, Vector3 pos, Vector3 normal) {
+		BoxCollider2D col = this.GetComponent<BoxCollider2D> ();
+		//transform.parent = null;
+		transform.rotation = Quaternion.FromToRotation (transform.up, normal) * transform.rotation;
+		transform.position = pos + transform.up * col.size.y;
+		//transform.SetParent (surface);
+	}
+
+	protected void checkForDeath() {
 		if (health <= 0) {
 			foreach (Transform t in transform)
 				if (t.name.Contains ("whitebloodcell"))
@@ -91,17 +110,6 @@ public class Enemy : MonoBehaviour {
 			dead = true;
 			StartCoroutine (Die ());
 		}
-		if (Vector3.Distance (transform.position, player.transform.position) <= detectDistance) {
-			//Debug.Log(this.name + " trying to shoot");
-			shootProjectile ();
-		}
-	}
-	protected virtual void SnapTo(Transform surface, Vector3 pos, Vector3 normal) {
-		BoxCollider2D col = this.GetComponent<BoxCollider2D> ();
-		//transform.parent = null;
-		transform.rotation = Quaternion.FromToRotation (transform.up, normal) * transform.rotation;
-		transform.position = pos + transform.up * col.size.y;
-		//transform.SetParent (surface);
 	}
 
 	protected IEnumerator Die() {

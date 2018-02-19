@@ -28,14 +28,12 @@ public class BoneRotate : MonoBehaviour {
 
 	void OnTriggerEnter2D(Collider2D col) {
 		if (col.gameObject.name == "Player") {
-			Debug.Log ("entering " + gameObject.name);
 			colliding = true;
 		}
 	}
 
 	void OnTriggerExit2D(Collider2D col) {
 		if (col.gameObject.name == "Player") {
-			Debug.Log ("exiting " + gameObject.name);
 			colliding = false;
 		}
 	}
