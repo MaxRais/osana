@@ -226,7 +226,7 @@ public class Enemy : MonoBehaviour {
 		if (hit.collider == null && hit2.collider != null) {
 			SnapTo (hit2.transform, hit2.point, hit2.normal);
 		}
-		if (hit.collider == null || (hit2.collider != null && hit2.collider.tag == "Obstacle")) {
+		if (hit.collider == null || (hit2.collider != null && hit2.collider.tag == "Obstacle") || traveled > range) {
 			traveled = 0;
 			direction *= -1;
 			//rb.velocity = Vector2.zero;
@@ -241,6 +241,7 @@ public class Enemy : MonoBehaviour {
 			rb.velocity = platform.right * direction * speed;
 		else
 			rb.velocity = transform.right * direction * speed;
+		traveled += Vector3.Magnitude (transform.right * speed * Time.deltaTime * direction);
 		transform.rotation = Quaternion.Lerp (transform.rotation, targetRot, Time.deltaTime * rotSpeed);
 
 	}
