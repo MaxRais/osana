@@ -219,6 +219,10 @@ public class Enemy : MonoBehaviour {
 			Vector3 pos = transform.position;
 			pos.y += -hit.normal.x * Mathf.Abs (rb.velocity.x) * Time.deltaTime * (rb.velocity.x - hit.normal.x > 0 ? 1 : -1);
 			transform.position = pos;
+			if(hit.collider.name != platform.name)
+				SnapTo (hit.transform, hit.point, hit.normal);
+		} else if (hit.collider != null && hit.collider.tag == "Obstacle" && hit.collider.name != platform.name) {
+			SnapTo (hit.transform, hit.point, hit.normal);
 		}
 
 		if (hit.collider == null && hit2.collider != null) {
