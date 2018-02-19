@@ -38,6 +38,9 @@ public class HoverEnemy : Enemy {
 			shootProjectile ();
 		}
 	}
+	protected override void FixedUpdate() {
+
+	}
 
 	protected override void SnapTo(Transform surface, Vector3 pos, Vector3 normal) {
 		BoxCollider2D col = this.GetComponent<BoxCollider2D> ();

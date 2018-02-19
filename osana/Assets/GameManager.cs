@@ -7,15 +7,30 @@ public class GameManager : MonoBehaviour {
 	public int goalKills;
 	private int killsLeft;
 	private bool isFinished;
+	public Transform[] checkpoints;
+	private int currentCheck = 0;
+	public bool horizontal;
+	private GameObject player1;
 
 	// Use this for initialization
 	void Start () {
 		killsLeft = goalKills;
 		isFinished = false;
+		player1 = GameObject.FindGameObjectWithTag ("Player");
 	}
 	// Update is called once per frame
 	void Update () {
-		
+		if (horizontal && player1.transform.position.x > checkpoints [currentCheck].position.x) {
+			player1.GetComponent<Player> ().updateSpawnPoint (checkpoints [currentCheck]);
+			if(currentCheck + 1 < checkpoints.Length)
+				currentCheck++;
+		}
+		else if (!horizontal && player1.transform.position.y > checkpoints [currentCheck].position.y) {
+			player1.GetComponent<Player> ().updateSpawnPoint (checkpoints [currentCheck]);
+			Debug.Log (checkpoints [currentCheck].name);
+			if(currentCheck + 1 < checkpoints.Length)
+				currentCheck++;
+		}
 	}
 		
 	public bool IsFinished() {
