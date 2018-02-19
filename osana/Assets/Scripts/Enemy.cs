@@ -145,14 +145,13 @@ public class Enemy : MonoBehaviour {
 			Debug.DrawRay (pos, norm, Color.green, 1f);
 			BoxCollider2D col = this.GetComponent<BoxCollider2D> ();
 			//transform.parent = null;
-			//transform.Rotate(0, 0, (snapDown ? norm.y : -norm.y), Space.World);
 			platform = surface;
-			//Quaternion rotAmt = (Quaternion.FromToRotation (transform.up, norm));
+			Quaternion rotAmt = (Quaternion.FromToRotation (transform.up, norm));
 			//targetRot = rotAmt;
 			//Debug.Log(gameObject.name + " : " + rotAmt.z);
 			rotating = true;
 			snapDown = (norm.y > 0);
-			transform.rotation = (snapDown ? new Quaternion (0, 0, 0, 0) : new Quaternion (0, 0, 180, 0));
+			targetRot = (snapDown ? new Quaternion (0, 0, 0, 0) : new Quaternion (0, 0, 180, 0));
 			//transform.rotation = Quaternion.FromToRotation (transform.up, norm) * transform.rotation;
 			transform.position = pos + norm * col.size.y;
 			//transform.SetParent (surface);
@@ -199,7 +198,7 @@ public class Enemy : MonoBehaviour {
 		Destroy (this.gameObject);
 	}
 
-	protected void FixedUpdate() {
+	protected virtual void FixedUpdate() {
 		BoxCollider2D col = this.GetComponent<BoxCollider2D> ();
 		float top = col.offset.y + (col.size.y / 2f);
 		float btm = col.offset.y - (col.size.y / 2f);
@@ -221,17 +220,16 @@ public class Enemy : MonoBehaviour {
 			transform.position = pos;
 			if(hit.collider.name != platform.name)
 				SnapTo (hit.transform, hit.point, hit.normal);
-		} else if (hit.collider != null && hit.collider.tag == "Obstacle" && hit.collider.name != platform.name) {
+		} else if (hit.collider != null && hit.collider.tag == "Obstacle" && (platform == null || hit.collider.name != platform.name)) {
 			SnapTo (hit.transform, hit.point, hit.normal);
 		}
-
 		if (hit.collider == null && hit2.collider != null) {
 			SnapTo (hit2.transform, hit2.point, hit2.normal);
 		}
-		if (hit.collider == null || hit2.collider != null) {
+		if (hit.collider == null || (hit2.collider != null && hit2.collider.tag == "Obstacle")) {
 			traveled = 0;
 			direction *= -1;
-			rb.velocity = Vector2.zero;
+			//rb.velocity = Vector2.zero;
 		}
 
 		if (snapDown) {
@@ -243,11 +241,13 @@ public class Enemy : MonoBehaviour {
 			rb.velocity = platform.right * direction * speed;
 		else
 			rb.velocity = transform.right * direction * speed;
+		transform.rotation = Quaternion.Lerp (transform.rotation, targetRot, Time.deltaTime * rotSpeed);
 
 	}
 
 	protected void OnCollisionEnter2D(Collision2D col) {
 		if (col.gameObject.tag == "Enemy") {
+			traveled = 0;
 			direction *= -1;
 		}
 		if (col.gameObject.tag == "Player") {
