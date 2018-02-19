@@ -211,8 +211,9 @@ public class Enemy : MonoBehaviour {
 		Vector3 topRight = transform.TransformPoint(new Vector3(right, top, 0f));
 		Vector3 topLeft = transform.TransformPoint(new Vector3(left, top, 0f));
 
-		RaycastHit2D hit = Physics2D.Raycast (transform.position + transform.right * direction, (snapDown ? -Vector2.up : Vector2.up), col.size.y + 1, layerMask);
+		RaycastHit2D hit = Physics2D.Raycast (transform.position + (snapDown ? transform.right * direction : -transform.right * direction), (snapDown ? -Vector2.up : Vector2.up), col.size.y + 3, layerMask);
 		RaycastHit2D hit2 = Physics2D.Raycast (transform.position, transform.right * direction, col.size.x + 1, layerMask);
+		Debug.DrawRay (transform.position + (snapDown ? transform.right * direction : -transform.right * direction), (snapDown ? -Vector2.up : Vector2.up), Color.red, 1f);
 		if (hit.collider != null && hit.collider.tag == "Obstacle" && Mathf.Abs (hit.normal.x) > 0.1f) {
 			rb.velocity = new Vector2 (rb.velocity.x - (hit.normal.x), rb.velocity.y);
 			Vector3 pos = transform.position;
