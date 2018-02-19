@@ -8,6 +8,7 @@ public class FollowPlayer : MonoBehaviour {
 	public float speed;
 	public float maxDistance;
 	public float minDistance;
+	public Vector3 startPos;
 
 	private bool alertedFollow = false;
 	private bool alertedLatch = false;
@@ -20,6 +21,7 @@ public class FollowPlayer : MonoBehaviour {
 	private Transform mapParent;
 	// Use this for initialization
 	void Start () {
+		startPos = this.transform.position;
 		player = GameObject.Find("Player");
 		forces = new float[]{-100, 100};
 		enemyList = GameObject.FindGameObjectsWithTag ("Enemy");
@@ -33,11 +35,13 @@ public class FollowPlayer : MonoBehaviour {
 	void Update () {
 
 		target = player;
-		float closest = Vector3.Distance(enemyList[0].transform.position, this.transform.position);
-		foreach (GameObject o in enemyList) {
-			if (o != null && Vector3.Distance(o.transform.position, this.transform.position) < Vector3.Distance(player.transform.position, this.transform.position) && Vector3.Distance(o.transform.position, this.transform.position) <= closest) {
-				target = o;
-				closest = Vector3.Distance (o.transform.position, this.transform.position);
+		if (enemyList.Length > 0) {
+			float closest = Vector3.Distance (enemyList [0].transform.position, this.transform.position);
+			foreach (GameObject o in enemyList) {
+				if (o != null && Vector3.Distance (o.transform.position, this.transform.position) < Vector3.Distance (player.transform.position, this.transform.position) && Vector3.Distance (o.transform.position, this.transform.position) <= closest) {
+					target = o;
+					closest = Vector3.Distance (o.transform.position, this.transform.position);
+				}
 			}
 		}
 
@@ -53,10 +57,11 @@ public class FollowPlayer : MonoBehaviour {
 			//speed = 3f;
 		} else if (Vector3.Distance (this.transform.position, target.transform.position) > maxDistance){
 			alertedFollow = false;
-			transform.LookAt(returnPoint.transform.position - this.transform.position);
-			transform.Rotate(new Vector3(0,-90,0));
-			this.transform.Translate (new Vector3 (speed * Time.deltaTime, 0, 0));
-
+			if (this.gameObject.transform.position == returnPoint.transform.position) {
+				transform.LookAt (returnPoint.transform.position - this.transform.position);
+				transform.Rotate (new Vector3 (0, -90, 0));
+				this.transform.Translate (new Vector3 (speed * Time.deltaTime, 0, 0));
+			}
 
 		} else if (Vector3.Distance (this.transform.position, target.transform.position) < minDistance){
 			//speed = 0f;\
@@ -69,26 +74,7 @@ public class FollowPlayer : MonoBehaviour {
 		if (!latched && alertedFollow){
 			this.transform.Translate (new Vector3 (speed * Time.deltaTime, 0, 0));
 		}
-		/*
-		if (Vector3.Distance (this.transform.position, player.transform.position) < minDistance && latched == false) {
-			latched = true;
-			//StartCoroutine (eject());
-			//this.transform.position = player.transform.position;
-			if (!alertedLatch) {
-				//DisplayMessage.ins.showMessage ("white blood cell has latched");
-				alertedLatch = true;
-			}
-		} else {
-			//latched = false;
-			alertedLatch = false;
-		}
-
-		if (latched){
-			////Vector3 p = player.transform.position - this.transform.position;
-			//this.transform.Translate(p);
-			this.transform.Translate (new Vector3 (speed * 3 * Time.deltaTime, 0, 0));
-
-		}*/
+	
 	}
 
 	IEnumerator eject(GameObject target){
@@ -106,6 +92,9 @@ public class FollowPlayer : MonoBehaviour {
 			this.gameObject.transform.SetParent (mapParent);
 			transform.Translate (new Vector3 (-speed * Time.deltaTime, 0, 0));
 			yield return new WaitForSeconds (Random.Range (3f, 4.5f));
+			if (target == null) {
+				yield break;
+			}
 			transform.LookAt (target.transform);
 			transform.Rotate (new Vector3 (0, -90, 0));
 			latched = false;
@@ -120,6 +109,10 @@ public class FollowPlayer : MonoBehaviour {
 		StopAllCoroutines();
 
 
+	}
+
+	public void StopCoroutines(){
+		StopAllCoroutines();
 	}
 
 	public void ResetParent() {

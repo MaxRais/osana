@@ -33,6 +33,7 @@ public class Player : MonoBehaviour
     private float minJumpVelocity;
     private Vector3 velocity;
     private float velocityXSmoothing;
+	public LayerMask layerMask;
 
     private Controller2D controller;
 	private Animator animator;
@@ -65,6 +66,8 @@ public class Player : MonoBehaviour
 	private float dashTimer;
 	private GameObject recharge;
 	public GameObject healthBar;
+	public float bounceHeight;
+	public float bounceDist;
 
     private void Start()
     {
@@ -87,6 +90,13 @@ public class Player : MonoBehaviour
 		this.health = startHealth;
 		this.healthBar.GetComponent<SpriteRenderer> ().enabled = true;
 		this.transform.position = spawnPoint.position;
+		foreach (GameObject wbc in GameObject.FindGameObjectsWithTag("WBC")) {
+			FollowPlayer fb = wbc.GetComponent<FollowPlayer> ();
+			wbc.transform.position = fb.startPos;
+			fb.StopCoroutines ();
+			fb.ResetParent ();
+		}
+
 		DisplayMessage.ins.clearQueue ();
 		dead = false;
 		animator.SetBool ("dead", false);
@@ -125,8 +135,8 @@ public class Player : MonoBehaviour
 		CalculateVelocity ();
 		HandleWallSliding ();
 
-		RaycastHit2D hit = Physics2D.Raycast(transform.position, -Vector3.up, 2f, ~(1 << 8));
-		if (hit.collider != null && hit.transform.gameObject.layer == LayerMask.NameToLayer("Obstacle")) {
+		RaycastHit2D hit = Physics2D.Raycast(transform.position, -Vector3.up, 2f, layerMask);
+		if (hit.collider != null && hit.transform.gameObject.layer == LayerMask.NameToLayer ("Obstacle")) {
 			float distanceToGround = hit.distance;
 		}
 		if (controller.collisions.below && isJumping && velocity.y < 0) {
@@ -171,11 +181,11 @@ public class Player : MonoBehaviour
 	void FixedUpdate() {
 		Rigidbody2D rb = this.GetComponent<Rigidbody2D> ();
 		if (velocity.y < 0) {
-			RaycastHit2D hit = Physics2D.Raycast (transform.position, Vector2.down, 2f, ~(1 << 8));
-			if (hit.collider != null && hit.transform.gameObject.layer == LayerMask.NameToLayer("Obstacle")) {
-				transform.position = hit.point + Vector2.up;
-				rb.constraints = (RigidbodyConstraints2D.FreezeRotation | RigidbodyConstraints2D.FreezePositionY);
-				rb.velocity = new Vector2 (0, 0);
+			RaycastHit2D hit = Physics2D.Raycast (transform.position, Vector2.down, 2f, layerMask);
+			if (hit.collider != null && hit.transform.gameObject.tag == "Obstacle") {
+				//transform.position = hit.point + Vector2.up;
+				//rb.constraints = (RigidbodyConstraints2D.FreezeRotation | RigidbodyConstraints2D.FreezePositionY);
+				//rb.velocity = new Vector2 (0, 0);
 			}
 		}
 	}
@@ -208,6 +218,18 @@ public class Player : MonoBehaviour
 				restart ();
 		}
 	}
+	void OnCollisionEnter2D(Collision2D c) {
+		if (c.gameObject.tag == "Bounce") {
+			isDoubleJumping = false;
+			isJumping = true;
+			Vector2 dir = c.contacts [0].point - new Vector2 (transform.position.x, transform.position.y);
+			dir = -dir.normalized;
+
+			dir.x = dir.x * bounceDist;
+			dir.y = bounceHeight;
+			velocity = dir;
+		}
+	}
 
 	IEnumerator Blink(int amt) {
 		for (int i = 0; i < amt * 2; i++) {
@@ -226,15 +248,15 @@ public class Player : MonoBehaviour
 		if (input.x == -1 && !dead) {
 			facingRight = false;
 			animator.SetInteger ("xDir", -1);
+			this.GetComponent<SpriteRenderer> ().flipX = true;
 			if (controller.collisions.below) {
-				this.GetComponent<SpriteRenderer> ().flipX = true;
 				playWalkSound();
 			}
 		} else if (input.x == 1 && !dead) {
 			facingRight = true;
 			animator.SetInteger ("xDir", 1);
+			this.GetComponent<SpriteRenderer> ().flipX = false;
 			if (controller.collisions.below) {
-				this.GetComponent<SpriteRenderer> ().flipX = false;
 				playWalkSound();
 			}
 		} else if (input.x == 0) {

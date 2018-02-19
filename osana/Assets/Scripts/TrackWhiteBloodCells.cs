@@ -22,7 +22,7 @@ public class TrackWhiteBloodCells : MonoBehaviour {
 			}
 		}
 		if (currentLatched >= health) {
-			this.GetComponent<Player> ().restart ();
+			//this.GetComponent<Player> ().restart ();
 		}
 	}
 }

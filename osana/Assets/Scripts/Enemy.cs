@@ -25,6 +25,8 @@ public class Enemy : MonoBehaviour {
 	protected float maxHealth;
 	protected float shotTimer;
 	public LayerMask layerMask;
+	public AudioClip deathSound;
+	protected bool dead;
 
 	// Use this for initialization
 	protected virtual void Start () {
@@ -39,7 +41,7 @@ public class Enemy : MonoBehaviour {
 		// Snap enemy to platform they are on
 		RaycastHit2D hit = Physics2D.Raycast(transform.position, (snapDown ? Vector2.down : Vector2.up), 25f, layerMask);
 		if (hit.collider != null && hit.collider.tag == "Obstacle") { 
-			SnapTo (hit.transform, hit.point,  hit.normal);
+			SnapTo (hit.transform, hit.point, hit.normal);
 		}
 	}
 	
@@ -63,10 +65,13 @@ public class Enemy : MonoBehaviour {
 			traveled = 0;
 			direction *= -1;
 		} else if (hit.collider != null && hit.transform.gameObject.layer == LayerMask.NameToLayer("Obstacle")) {
-			RaycastHit2D hit3 = Physics2D.Raycast((direction == 1 ? btmRight : btmLeft) + (transform.up / 2f) , transform.right * direction, 0.3f, ~(1 << 10));
+			RaycastHit2D hit3 = Physics2D.Raycast((direction == 1 ? btmRight : btmLeft) + (transform.up / 2f) , transform.right * direction, 0.3f, layerMask);
 			if (hit3.collider != null && hit3.collider.tag == "Obstacle") {
 				SnapTo (hit3.transform, hit3.point, hit3.normal);
 			} else {
+				SnapTo (hit.transform, hit.point, hit.normal);
+			}
+			/*else {
 				float diff = (hit.collider.offset.y + (hit.transform.gameObject.GetComponent<BoxCollider2D>().size.y / 2f)) - hit.transform.InverseTransformPoint (hit.point).y;
 				if(!snapDown)
 					diff = (hit.collider.offset.y - (hit.transform.gameObject.GetComponent<BoxCollider2D>().size.y / 2f)) - hit.transform.InverseTransformPoint (hit.point).y;
@@ -74,8 +79,24 @@ public class Enemy : MonoBehaviour {
 					traveled += Vector3.Magnitude (transform.right * speed * Time.deltaTime * direction);
 					SnapTo (hit.transform, hit.point, hit.normal);
 				}
-			}
+			}*/
 		}
+		checkForDeath ();
+		if (Vector3.Distance (transform.position, player.transform.position) <= detectDistance) {
+			//Debug.Log(this.name + " trying to shoot");
+			shootProjectile ();
+		}
+	}
+
+	protected virtual void SnapTo(Transform surface, Vector3 pos, Vector3 normal) {
+		BoxCollider2D col = this.GetComponent<BoxCollider2D> ();
+		//transform.parent = null;
+		transform.rotation = Quaternion.FromToRotation (transform.up, normal) * transform.rotation;
+		transform.position = pos + transform.up * col.size.y;
+		//transform.SetParent (surface);
+	}
+
+	protected void checkForDeath() {
 		if (health <= 0) {
 			foreach (Transform t in transform)
 				if (t.name.Contains ("whitebloodcell"))
@@ -83,19 +104,36 @@ public class Enemy : MonoBehaviour {
 			GameObject manager = GameObject.Find ("GameManager");
 			if(manager)
 				manager.GetComponent<GameManager> ().AddKill ();
-			Destroy (this.gameObject);
-		}
-		if (Vector3.Distance (transform.position, player.transform.position) <= detectDistance) {
-			//Debug.Log(this.name + " trying to shoot");
-			shootProjectile ();
+			if (dead) {
+				return;
+			}
+			dead = true;
+			StartCoroutine (Die ());
 		}
 	}
-	protected virtual void SnapTo(Transform surface, Vector3 pos, Vector3 normal) {
-		BoxCollider2D col = this.GetComponent<BoxCollider2D> ();
-		//transform.parent = null;
-		transform.rotation = Quaternion.FromToRotation (transform.up, normal) * transform.rotation;
-		transform.position = pos + transform.up * col.size.y;
-		//transform.SetParent (surface);
+
+	protected IEnumerator Die() {
+		this.speed = 0;
+		this.detectDistance = 0;
+		AudioSource player = this.GetComponent<AudioSource> ();
+		player.Stop ();
+		player.clip = deathSound;
+		player.loop = false;
+		player.volume = 1;
+		player.Play ();
+		while (player.isPlaying) {
+			foreach (Transform t in transform)
+				if (t.name.Contains ("whitebloodcell"))
+					t.GetComponent<FollowPlayer> ().ResetParent ();
+			
+			Vector3 scale = this.transform.localScale;
+			scale -= Vector3.one * Time.deltaTime;
+			if (scale.x < 0)
+				scale = Vector3.zero;
+			this.transform.localScale = scale;
+			yield return null;
+		}
+		Destroy (this.gameObject);
 	}
 
 	protected void FixedUpdate() {

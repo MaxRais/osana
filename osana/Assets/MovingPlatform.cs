@@ -13,8 +13,8 @@ public class MovingPlatform : MonoBehaviour {
 	private GameObject passenger;
 	// Use this for initialization
 	void Start () {
-		up = true;
-		right = true;
+		up = verticalMovement > 0;
+		right = horizontalMovement > 0;
 		moving = true;
 		startPos = transform.position;
 	}
