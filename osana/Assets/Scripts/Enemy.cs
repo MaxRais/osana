@@ -141,7 +141,7 @@ public class Enemy : MonoBehaviour {
 	}
 
 	protected virtual void SnapTo(Transform surface, Vector3 pos, Vector3 norm) {
-		if(!rotating && !climbing) {
+
 			Debug.DrawRay (pos, norm, Color.green, 1f);
 			BoxCollider2D col = this.GetComponent<BoxCollider2D> ();
 			//transform.parent = null;
@@ -155,7 +155,6 @@ public class Enemy : MonoBehaviour {
 			//transform.rotation = Quaternion.FromToRotation (transform.up, norm) * transform.rotation;
 			transform.position = pos + norm * col.size.y;
 			//transform.SetParent (surface);
-		}
 	}
 
 	protected void checkForDeath() {
