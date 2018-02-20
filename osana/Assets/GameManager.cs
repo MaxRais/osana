@@ -16,6 +16,9 @@ public class GameManager : MonoBehaviour {
 	void Start () {
 		killsLeft = goalKills;
 		isFinished = false;
+
+		if (goalKills == 0)
+			isFinished = true;
 		player1 = GameObject.FindGameObjectWithTag ("Player");
 	}
 	// Update is called once per frame
