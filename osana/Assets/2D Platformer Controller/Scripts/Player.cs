@@ -82,8 +82,8 @@ public class Player : MonoBehaviour
         gravity = -(2 * maxJumpHeight) / Mathf.Pow(timeToJumpApex, 2);
         maxJumpVelocity = Mathf.Abs(gravity) * timeToJumpApex;
         minJumpVelocity = Mathf.Sqrt(2 * Mathf.Abs(gravity) * minJumpHeight);
-		//spawnPoint = GameObject.Find("SpawnMarker").transform;
-		spawnPoint.position = this.transform.position;
+		spawnPoint = GameObject.Find("SpawnMarker").transform;
+		//spawnPoint.position = this.transform.position + transform.up;
 		startHealth = health;
     }
 
@@ -103,9 +103,7 @@ public class Player : MonoBehaviour
 		animator.SetBool ("dead", false);
 	}
 
-	IEnumerator Die(float sec) {
-		if (dead)
-			yield break;
+	IEnumerator Die(float sec) {	
 
 		this.healthBar.GetComponent<SpriteRenderer> ().enabled = false;
 		animator.SetBool ("dead", true);
@@ -184,9 +182,9 @@ public class Player : MonoBehaviour
 		if (velocity.y < 0) {
 			RaycastHit2D hit = Physics2D.Raycast (transform.position, Vector2.down, 2f, layerMask);
 			if (hit.collider != null && hit.transform.gameObject.tag == "Obstacle") {
-				//transform.position = hit.point + Vector2.up;
-				//rb.constraints = (RigidbodyConstraints2D.FreezeRotation | RigidbodyConstraints2D.FreezePositionY);
-				//rb.velocity = new Vector2 (0, 0);
+				transform.position = hit.point + Vector2.up;
+				rb.constraints = (RigidbodyConstraints2D.FreezeRotation | RigidbodyConstraints2D.FreezePositionY);
+				rb.velocity = new Vector2 (0, 0);
 			}
 		}
 	}
@@ -202,7 +200,7 @@ public class Player : MonoBehaviour
 
 	void ApplyPush(int amt, Vector2 dir) {
 		Rigidbody2D rb = this.GetComponent<Rigidbody2D> ();
-		rb.constraints = RigidbodyConstraints2D.FreezeRotation;
+		rb.constraints = (RigidbodyConstraints2D.FreezeRotation | RigidbodyConstraints2D.FreezePositionY);
 		dir.y += 0.5f;
 		rb.velocity = (dir * amt * 10f);
 	}
@@ -330,7 +328,7 @@ public class Player : MonoBehaviour
 	}
 	public void ShootProjectile()
 	{
-		if (shot)
+		if (shot || dead)
 			return;
 
 		GameObject bullet = Instantiate (bulletPrefab) as GameObject;
@@ -410,6 +408,7 @@ public class Player : MonoBehaviour
 		if (this.transform.position.y < deathMarker.position.y) {
 			restart ();
 		} else if (this.health <= 0) {
+			dead = true;
 			StartCoroutine (Die (3));
 		}
 	}

@@ -16,11 +16,11 @@ public class MenuManager : MonoBehaviour {
 	}
 
 	public void Tutorial() {
-		SceneManager.LoadScene ("Level1Dave");
+		SceneManager.LoadScene ("Tutorial");
 	}
 
 	public void Level1() {
-		SceneManager.LoadScene ("Intro");
+		SceneManager.LoadScene ("Level1Reverse");
 	}
 
 	public void Exit() {
