@@ -168,6 +168,7 @@ public class Enemy : MonoBehaviour {
 				return;
 			}
 			dead = true;
+			this.GetComponent<Collider2D> ().enabled = false;
 			StartCoroutine (Die ());
 		}
 	}

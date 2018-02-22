@@ -107,7 +107,7 @@ public class Player : MonoBehaviour
 
 		this.healthBar.GetComponent<SpriteRenderer> ().enabled = false;
 		animator.SetBool ("dead", true);
-		dead = true;
+		//dead = true;
 		yield return new WaitForSeconds(sec);
 		restart();
 	}
@@ -333,8 +333,8 @@ public class Player : MonoBehaviour
 
 		GameObject bullet = Instantiate (bulletPrefab) as GameObject;
 		bullet.transform.position = this.transform.position;
-		Vector2 dir = new Vector2 (0f, 0f);
-		if (directionalInput.x < 0 && directionalInput.y > 0)
+		Vector2 dir = directionalInput;//new Vector2 (0f, 0f);
+		/*if (directionalInput.x < 0 && directionalInput.y > 0)
 			dir.Set (-0.5f, (isJumping ? 0.5f : 0.25f));
 		if (directionalInput.x > 0 && directionalInput.y > 0)
 			dir.Set (0.5f, (isJumping ? 0.5f : 0.25f));
@@ -345,7 +345,7 @@ public class Player : MonoBehaviour
 		if (directionalInput.x == 0 && directionalInput.y > 0)
 			dir.Set (0, 1);
 		if (directionalInput.x == 0 && directionalInput.y < 0)
-			dir.Set (0, -1);
+			dir.Set (0, -1);*/
 		bullet.transform.rotation = Quaternion.FromToRotation ((facingRight ? transform.right : -transform.right), dir) 
 			* bullet.transform.rotation;
 		
