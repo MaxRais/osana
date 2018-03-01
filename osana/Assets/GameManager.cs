@@ -5,6 +5,8 @@ using UnityEngine;
 public class GameManager : MonoBehaviour {
 
 	public int goalKills;
+	public int goalCollect;
+	private int collected;
 	private int killsLeft;
 	private bool isFinished;
 	public Transform[] checkpoints;
@@ -16,8 +18,9 @@ public class GameManager : MonoBehaviour {
 	void Start () {
 		killsLeft = goalKills;
 		isFinished = false;
+		collected = 0;
 
-		if (goalKills == 0)
+		if (goalKills == 0 && goalCollect == 0)
 			isFinished = true;
 		player1 = GameObject.FindGameObjectWithTag ("Player");
 	}
@@ -43,6 +46,13 @@ public class GameManager : MonoBehaviour {
 		return killsLeft;
 	}
 
+	public void Collect() {
+		collected++;
+		if (collected == goalCollect) {
+			isFinished = true;
+			DisplayMessage.ins.showMessage ("Collection goal reached");
+		}
+	}
 	public void AddKill() {
 		killsLeft--;
 		if (killsLeft > 0) {
