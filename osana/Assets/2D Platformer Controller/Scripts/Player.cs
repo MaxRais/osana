@@ -183,7 +183,7 @@ public class Player : MonoBehaviour
 		if (velocity.y < 0) {
 			RaycastHit2D hit = Physics2D.Raycast (transform.position, Vector2.down, 2f, layerMask);
 			if (hit.collider != null && hit.transform.gameObject.tag == "Obstacle") {
-				transform.position = hit.point + Vector2.up;
+				//transform.position = hit.point + Vector2.up;
 				rb.constraints = (RigidbodyConstraints2D.FreezeRotation | RigidbodyConstraints2D.FreezePositionY);
 				rb.velocity = new Vector2 (0, 0);
 			}
@@ -279,6 +279,7 @@ public class Player : MonoBehaviour
 				if (wallDirX == directionalInput.x) {
 					velocity.x = -wallDirX * wallJumpClimb.x;
 					velocity.y = wallJumpClimb.y;
+					directionalInput.x *= -1;
 				} else if (directionalInput.x == 0) {
 					velocity.x = -wallDirX * wallJumpOff.x;
 					velocity.y = wallJumpOff.y;
@@ -395,8 +396,8 @@ public class Player : MonoBehaviour
     private void CalculateVelocity()
     {
         float targetVelocityX = directionalInput.x * moveSpeed;
-		if (velocity.x < 0 && directionalInput.x > 0 || velocity.x > 0 && directionalInput.x < 0)
-			velocity.x = 0;
+		//if (velocity.x < 0 && directionalInput.x > 0 || velocity.x > 0 && directionalInput.x < 0)
+			//velocity.x = 0;
 		if (dead) {
 			targetVelocityX = 0;
 		}
