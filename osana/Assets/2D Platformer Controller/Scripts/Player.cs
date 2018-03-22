@@ -290,7 +290,7 @@ public class Player : MonoBehaviour
 				isDoubleJumping = false;
 				playJumpSound();
 			}
-			if (controller.collisions.below) {
+			if (controller.collisions.below || Physics2D.Raycast(this.transform.position, -transform.up).collider.tag == "Obstacle" && Vector2.Distance(Physics2D.Raycast(this.transform.position, -transform.up).collider.transform.position, transform.position) < 1) {
 				velocity.y = maxJumpVelocity;
 				isJumping = true;
 				isDoubleJumping = false;
