@@ -42,7 +42,8 @@ public class PlayerInput : MonoBehaviour
 		{
 			player.SetDirectionalInput (Vector2.zero);
 		}
-		if (Input.GetButtonDown ("Start"))
-			SceneManager.LoadScene ("Menu");
+		if (Input.GetButtonDown ("Start")) {
+
+		}			
     }
 }
