@@ -38,13 +38,16 @@ public class ShootAt : MonoBehaviour {
 		script.speed = bulletSpeed;
 		Vector3 dir = player.transform.position - this.transform.position;
 		script.direction = (int)Mathf.Sign(dir.x);
+		if (player.transform.position.x < this.transform.position.x)
+			script.direction = (int)Mathf.Sign (dir.x) * -1;
 		script.source = this.gameObject;
 		bullet.transform.position = this.transform.position;
 		bullet.transform.parent = player.GetComponent<Player> ().environment;
 		//bullet.transform.position += Vector3.right * this.transform.localScale.x * direction;
+
 		bullet.transform.rotation = Quaternion.FromToRotation (transform.right, dir) 
 			* bullet.transform.rotation;
-
+		
 		shotTimer = 0;
 
 	}
