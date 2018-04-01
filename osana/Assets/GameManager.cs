@@ -31,7 +31,7 @@ public class GameManager : MonoBehaviour {
 			if(currentCheck + 1 < checkpoints.Length)
 				currentCheck++;
 		}
-		else if (!horizontal && player1.transform.position.y > checkpoints [currentCheck].position.y) {
+		else if (!horizontal && checkpoints.Length > 0 && player1.transform.position.y > checkpoints [currentCheck].position.y) {
 			player1.GetComponent<Player> ().updateSpawnPoint (checkpoints [currentCheck]);
 			Debug.Log (checkpoints [currentCheck].name);
 			if(currentCheck + 1 < checkpoints.Length)
