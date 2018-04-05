@@ -48,5 +48,11 @@ public class PositionTracker : MonoBehaviour {
 		if (SceneManager.GetActiveScene ().name == "Minigame1") {
 			SceneManager.LoadScene ("Level2");
 		}
+		if (SceneManager.GetActiveScene ().name == "Level3") {
+			SceneManager.LoadScene ("Matching");
+		}
+		if (SceneManager.GetActiveScene ().name == "Matching") {
+			SceneManager.LoadScene ("Level3");
+		}
 	}
 }

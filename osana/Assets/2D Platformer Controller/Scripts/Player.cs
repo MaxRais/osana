@@ -86,7 +86,10 @@ public class Player : MonoBehaviour
         minJumpVelocity = Mathf.Sqrt(2 * Mathf.Abs(gravity) * minJumpHeight);
 
 		startHealth = health;
-		spawnPoint = GameObject.Find("SpawnMarker").transform;
+		GameObject spawnObject = GameObject.Find ("SpawnMarker");
+		if (spawnObject) {
+			spawnPoint = GameObject.Find ("SpawnMarker").transform;
+		}
 		//spawnPoint.position = this.transform.position + transform.up;
     }
 
@@ -411,7 +414,7 @@ public class Player : MonoBehaviour
     }
 
 	private void checkForDead() {
-		if (this.transform.position.y < deathMarker.position.y) {
+		if (deathMarker && this.transform.position.y < deathMarker.position.y) {
 			restart ();
 		} else if (this.health <= 0) {
 			dead = true;
