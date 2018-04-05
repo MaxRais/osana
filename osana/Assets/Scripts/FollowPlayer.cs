@@ -21,6 +21,7 @@ public class FollowPlayer : MonoBehaviour {
 	private Transform mapParent;
 	// Use this for initialization
 	void Start () {
+		
 		startPos = this.transform.position;
 		player = GameObject.Find("Player");
 		forces = new float[]{-100, 100};
@@ -30,9 +31,24 @@ public class FollowPlayer : MonoBehaviour {
 		returnPoint.transform.SetParent (transform.parent);
 		mapParent = this.transform.parent;
 	}
+
+	public void Restart(){
+		StopAllCoroutines ();
+		ResetParent ();
+
+		this.transform.position = startPos;
+		player = GameObject.Find("Player");
+		forces = new float[]{-100, 100};
+		enemyList = GameObject.FindGameObjectsWithTag ("Enemy");
+		returnPoint.transform.position = startPos;
+		returnPoint.transform.SetParent (transform.parent);
+		mapParent = this.transform.parent;
+
+	}
 	
 	// Update is called once per frame
 	void Update () {
+
 
 		target = player;
 		if (enemyList.Length > 0) {
@@ -47,6 +63,9 @@ public class FollowPlayer : MonoBehaviour {
 
 		transform.LookAt(target.transform);
 		transform.Rotate(new Vector3(0,-90,0));
+
+		//transform.eulerAngles = new Vector3 (transform.eulerAngles.x, 0, transform.eulerAngles.z);
+
 		if (Vector3.Distance (this.transform.position, target.transform.position) < maxDistance && Vector3.Distance (this.transform.position, target.transform.position) > minDistance) {
 			
 			if (!alertedFollow) {

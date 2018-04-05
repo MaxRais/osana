@@ -1,5 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
+using UnityEngine.SceneManagement;
+
 
 [RequireComponent(typeof(Controller2D))]
 public class Player : MonoBehaviour
@@ -94,9 +96,7 @@ public class Player : MonoBehaviour
 		this.transform.position = spawnPoint.position;
 		foreach (GameObject wbc in GameObject.FindGameObjectsWithTag("WBC")) {
 			FollowPlayer fb = wbc.GetComponent<FollowPlayer> ();
-			wbc.transform.position = fb.startPos;
-			fb.StopCoroutines ();
-			fb.ResetParent ();
+			fb.Restart ();
 		}
 
 		DisplayMessage.ins.clearQueue ();
@@ -110,7 +110,11 @@ public class Player : MonoBehaviour
 		animator.SetBool ("dead", true);
 		//dead = true;
 		yield return new WaitForSeconds(sec);
-		restart();
+		if (SceneManager.GetActiveScene ().name == "SpeedrunLevel") {
+			SceneManager.LoadScene ("SpeedrunLevel");
+		} else {
+			restart ();
+		}
 	}
 
 	public void updateSpawnPoint(Transform newPos) {
