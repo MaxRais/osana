@@ -97,22 +97,26 @@ public class Player : MonoBehaviour
 		this.health = startHealth;
 		this.healthBar.GetComponent<SpriteRenderer> ().enabled = true;
 		this.transform.position = spawnPoint.position;
+		this.transform.localEulerAngles = Vector3.zero;
 		foreach (GameObject wbc in GameObject.FindGameObjectsWithTag("WBC")) {
 			FollowPlayer fb = wbc.GetComponent<FollowPlayer> ();
 			fb.Restart ();
 		}
-
 		DisplayMessage.ins.clearQueue ();
 		dead = false;
-		animator.SetBool ("dead", false);
+		//animator.SetBool ("dead", false);
 	}
 
 	IEnumerator Die(float sec) {	
 
 		this.healthBar.GetComponent<SpriteRenderer> ().enabled = false;
-		animator.SetBool ("dead", true);
-		//dead = true;
-		yield return new WaitForSeconds(sec);
+		//animator.SetBool ("dead", true);
+		dead = true;
+		float rotSpeed = 0.001f;
+		while (this.transform.localEulerAngles.z < 90) {
+			this.transform.Rotate (Vector3.forward * rotSpeed);
+		}
+		yield return new WaitForSeconds (0.5f);
 		if (SceneManager.GetActiveScene ().name == "SpeedrunLevel") {
 			SceneManager.LoadScene ("SpeedrunLevel");
 		} else {
