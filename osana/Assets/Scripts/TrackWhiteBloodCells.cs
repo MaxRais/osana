@@ -16,6 +16,9 @@ public class TrackWhiteBloodCells : MonoBehaviour {
 	void Update () {
 		int currentLatched = 0;
 		foreach (GameObject cell in wbc) {
+			if(!cell) {
+				continue;
+			}
 			FollowPlayer fp = cell.GetComponent<FollowPlayer> ();
 			if (fp.latched) {
 				currentLatched++;
