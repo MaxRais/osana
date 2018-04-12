@@ -47,7 +47,7 @@ public class CameraZoom : MonoBehaviour {
 		currentZoomSpeed = zoomSpeed;
 		levelStarted = true;
 		zoomingIn = false;
-		if (firstZoom) {
+		if (firstZoom && levelName != "") {
 			DisplayMessage.ins.showMessage ("Welcome to " + levelName);
 			firstZoom = false;
 		}

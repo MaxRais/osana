@@ -5,7 +5,7 @@ using UnityEngine;
 public class MatchingGame : MonoBehaviour {
 
 	public GameObject[] buttons;
-	public Color[] colors;
+	public Sprite[] sprites;
 	private int activeButton; 
 	public GameObject path;
 	public GameObject neuroPrefab;
@@ -25,11 +25,11 @@ public class MatchingGame : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
-		if (buttons.Length != colors.Length) {
+		if (buttons.Length != sprites.Length) {
 			Debug.LogError ("Colors and buttons not same size");
 		}
 		for (int i = 0; i < buttons.Length; i++) {
-			buttons [i].GetComponent<SpriteRenderer> ().color = colors [i];
+			buttons [i].GetComponent<SpriteRenderer> ().sprite = sprites [i];
 		}
 		setActiveButton(0);
 		StartCoroutine (waitAndStart ());
@@ -63,7 +63,8 @@ public class MatchingGame : MonoBehaviour {
 		if (spawnWait <= 0) {
 			GameObject g = Instantiate (neuroPrefab) as GameObject;
 			g.transform.position = neuroSpawnPoint.transform.position;
-			g.GetComponent<SpriteRenderer> ().color = colors [Random.Range (0, colors.Length)];
+			g.GetComponent<SpriteRenderer> ().sprite = sprites [Random.Range (0, sprites.Length)];
+			g.transform.localScale = Vector3.one * .5f;
 			g.GetComponent<Bullet> ().source = GameObject.Find("Player");
 			float percentage = (float)score / (float)maxScore;
 			g.GetComponent<Bullet> ().speed = minSpeed + (maxSpeed - minSpeed) * percentage;
@@ -75,15 +76,12 @@ public class MatchingGame : MonoBehaviour {
 
 	void setActiveButton(int index) {
 		activeButton = index;
-		this.GetComponent<SpriteRenderer> ().color = colors [index];
-		foreach (SpriteRenderer sr in path.GetComponentsInChildren<SpriteRenderer>()) {
-			sr.color = colors [index];
-		}
+		this.GetComponent<SpriteRenderer> ().sprite = sprites [index];
 	}
 
 	void OnTriggerEnter2D(Collider2D col) {
 		if (col.name.Contains ("Neurotransmitter")) {
-			int id = getIdFromColor (col.gameObject);
+			int id = getIdFromSprite (col.gameObject);
 			if (id == activeButton) {
 				score++;
 				DisplayMessage.ins.showMessage (score + " neurotransmitters through", 0.25f);
@@ -103,11 +101,11 @@ public class MatchingGame : MonoBehaviour {
 		}
 	}
 
-	int getIdFromColor(GameObject go) {
-		Color c = go.GetComponent<SpriteRenderer> ().color;
+	int getIdFromSprite(GameObject go) {
+		Sprite s = go.GetComponent<SpriteRenderer> ().sprite;
 		int i = 0;
-		foreach (Color color in colors) {
-			if (color.Equals (c)) {
+		foreach (Sprite sprite in sprites) {
+			if (sprite.name == (s.name)) {
 				return i;
 			}
 			i++;

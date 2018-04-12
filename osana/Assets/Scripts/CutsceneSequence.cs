@@ -24,7 +24,7 @@ public class CutsceneSequence : MonoBehaviour {
 
 	private IEnumerator playCutscene() {
 		yield return new WaitForSeconds (1.0f);
-		if (!showLogoLast) {
+		if (!showLogoLast && logo != null) {
 			fading = true;
 			StartCoroutine (fadeLogoOut (logo));
 			while (fading) {
@@ -40,14 +40,14 @@ public class CutsceneSequence : MonoBehaviour {
 			}
 		}
 
-		if (showLogoLast) {
+		if (showLogoLast && logo != null) {
 			fading = true;
 			StartCoroutine (fadeLogoIn (logo));
 			while (fading) {
 				yield return null;
 			}
 		} else {
-			SceneManager.LoadScene ("Level1");
+			SceneManager.LoadScene (SceneManager.GetActiveScene().buildIndex + 1);
 		}
 	}
 
