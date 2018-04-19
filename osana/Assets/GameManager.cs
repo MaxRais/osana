@@ -54,7 +54,7 @@ public class GameManager : MonoBehaviour {
 		collected++;
 		if (collected == goalCollect) {
 			isFinished = true;
-			DisplayMessage.ins.showMessage ("Collection goal reached");
+			DisplayMessage.ins.showMessage ("Task goal reached");
 		}
 	}
 	public void AddKill() {

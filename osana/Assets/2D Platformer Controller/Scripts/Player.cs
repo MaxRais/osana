@@ -94,6 +94,8 @@ public class Player : MonoBehaviour
     }
 
 	public void restart() {
+		animator.SetBool ("dead", false);
+		transform.rotation = new Quaternion (0, 0, 0, 0);
 		this.health = startHealth;
 		this.healthBar.GetComponent<SpriteRenderer> ().enabled = true;
 		this.transform.position = spawnPoint.position;
@@ -108,17 +110,20 @@ public class Player : MonoBehaviour
 	}
 
 	IEnumerator Die(float sec) {	
-
 		this.healthBar.GetComponent<SpriteRenderer> ().enabled = false;
-		//animator.SetBool ("dead", true);
+		animator.SetBool ("dead", true);
 		dead = true;
 		float rotSpeed = 0.001f;
-		while (this.transform.localEulerAngles.z < 90) {
-			this.transform.Rotate (Vector3.forward * rotSpeed);
-		}
-		yield return new WaitForSeconds (0.5f);
+		//while (this.transform.localEulerAngles.z < 90) {
+		//	this.transform.Rotate (Vector3.forward * rotSpeed);
+		//}
+		yield return new WaitForSeconds (1f);
 		if (SceneManager.GetActiveScene ().name == "SpeedrunLevel") {
 			SceneManager.LoadScene ("SpeedrunLevel");
+
+		}
+		if (SceneManager.GetActiveScene ().name == "Minigame1") {
+			GameObject.Find ("PositionTracker").GetComponent<PositionTracker> ().LoseGame ();
 		} else {
 			restart ();
 		}
@@ -413,7 +418,8 @@ public class Player : MonoBehaviour
 			targetVelocityX = 0;
 		}
         velocity.x = Mathf.SmoothDamp(velocity.x, targetVelocityX, ref velocityXSmoothing, (controller.collisions.below ? accelerationTimeGrounded : accelerationTimeAirborne));
-        velocity.y += gravity * Time.deltaTime;
+		if(!dead)
+		 	velocity.y += gravity * Time.deltaTime;
 
     }
 
@@ -441,9 +447,11 @@ public class Player : MonoBehaviour
 	}
 
 	private void playWalkSound() {
-		PlatformAudio p = controller.platform.GetComponent<PlatformAudio>();
-		if (p) {
-			controller.platform.GetComponent<PlatformAudio>().playWalkSound();
+		if (controller.platform) {
+			PlatformAudio p = controller.platform.GetComponent<PlatformAudio> ();
+			if (p) {
+				controller.platform.GetComponent<PlatformAudio> ().playWalkSound ();
+			}
 		}
 	}
 }

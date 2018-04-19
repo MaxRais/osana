@@ -103,7 +103,7 @@ public class FollowPlayer : MonoBehaviour {
 				hit = true;
 			}
 			if (!hit && target.tag == "Enemy") {
-				target.gameObject.GetComponent<Enemy> ().TakeDamage (1, this.gameObject.transform.right);
+				target.gameObject.GetComponent<Enemy> ().TakeDamage (1);
 				hit = true;
 			}
 			yield return new WaitForSeconds (Random.Range (1.75f, 3.5f));

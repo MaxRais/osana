@@ -257,7 +257,7 @@ public class Enemy : MonoBehaviour {
 		}
 	}
 
-	public void TakeDamage(int amt, Vector2 dir) {
+	public void TakeDamage(int amt) {
 		Debug.Log (this.name + " taking " + amt + " dmg");
 		this.health -= amt;
 		/*Rigidbody2D rb = this.GetComponent<Rigidbody2D> ();

@@ -23,7 +23,7 @@ public class WinMarker : MonoBehaviour {
 				if(GameObject.Find ("GameManager").GetComponent<GameManager> ().goalCollect == 0)
 					DisplayMessage.ins.showMessage ("Not enough kills yet. Kills remaining: " + GameObject.Find ("GameManager").GetComponent<GameManager> ().KillsLeft (), 2);
 				else if (GameObject.Find ("GameManager").GetComponent<GameManager> ().goalKills == 0)
-					DisplayMessage.ins.showMessage ("You haven't collected all the items. Items left: " + GameObject.Find ("GameManager").GetComponent<GameManager> ().ItemsLeft(), 2);
+					DisplayMessage.ins.showMessage ("You haven't completed all your tasks. Tasks left: " + GameObject.Find ("GameManager").GetComponent<GameManager> ().ItemsLeft(), 2);
 			}
 		}
 	}

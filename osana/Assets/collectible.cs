@@ -16,7 +16,7 @@ public class collectible : MonoBehaviour {
 
 	void OnTriggerEnter2D(Collider2D other) {
 		if (other.tag == "Player") {
-			GameObject.Find ("GameManager").GetComponent<GameManager> ().Collect ();
+			GameObject.Find ("MinigameManager").GetComponent<Minigame> ().Collect ();
 			Destroy (this.gameObject);
 		}
 	}

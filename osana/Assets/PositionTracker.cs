@@ -5,8 +5,11 @@ using UnityEngine.SceneManagement;
 
 public class PositionTracker : MonoBehaviour {
 
-	private Transform playerPos;
+	private Vector3 playerPos;
 	private static bool created = false;
+	private static bool wonGame = false;
+	public string[] minigames;
+	private int currentGame = -1;
 	void Awake() {
 		if (!created) {
 			DontDestroyOnLoad (this.gameObject);
@@ -16,7 +19,9 @@ public class PositionTracker : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
-		
+		for (int i = 0; i < minigames.Length; i++) {
+			GameObject.Find(minigames [i]).GetComponentInChildren<HoleEntry> ().minigameNumber = i;
+		}
 	}
 	
 	// Update is called once per frame
@@ -24,35 +29,55 @@ public class PositionTracker : MonoBehaviour {
 		
 	}
 
-	public void SetPlayerPos(Transform t) {
+	public void SetPlayerPos(Vector3 t) {
 		this.playerPos = t;
 	}
 
 	void OnEnable() {
-		SceneManager.sceneLoaded += OnLevelLoaded;
+		SceneManager.sceneLoaded += OnSceneLoaded;
 	}
 
 	void OnDisable() {
-		SceneManager.sceneLoaded -= OnLevelLoaded;
+		SceneManager.sceneLoaded -= OnSceneLoaded;
 	}
 
-	void OnLevelLoaded(Scene scene, LoadSceneMode mode) {
-		if (playerPos != null && SceneManager.GetActiveScene().name == "Level2")
-			GameObject.FindGameObjectWithTag ("Player").transform.position = playerPos.position;
-	}
-
-	public void LoadScene() {
-		if (SceneManager.GetActiveScene ().name == "Level2") {
-			SceneManager.LoadScene ("Minigame1");
-		}
+	public void WinGame() {
+		wonGame = true;
 		if (SceneManager.GetActiveScene ().name == "Minigame1") {
 			SceneManager.LoadScene ("Level2");
 		}
-		if (SceneManager.GetActiveScene ().name == "Level3") {
-			SceneManager.LoadScene ("Matching");
+		if (SceneManager.GetActiveScene ().name == "Matching") {
+			SceneManager.LoadScene ("Level3");
+		}
+	}
+	public void LoseGame() {
+		playerPos.x -= 3;
+		playerPos.y += 5;
+		if (SceneManager.GetActiveScene ().name == "Minigame1") {
+			SceneManager.LoadScene ("Level2");
 		}
 		if (SceneManager.GetActiveScene ().name == "Matching") {
 			SceneManager.LoadScene ("Level3");
+		}
+	}
+
+	void OnSceneLoaded(Scene scene, LoadSceneMode mode) {
+		if (wonGame) {
+			GameObject.Find("GameManager").GetComponent<GameManager> ().Collect ();
+			GameObject.Find(minigames [currentGame]).GetComponentInChildren<HoleEntry> ().DisableMinigame ();
+			wonGame = false;
+		}
+		if (playerPos != Vector3.zero && SceneManager.GetActiveScene().name == "Level2" || SceneManager.GetActiveScene().name == "Level3")
+			GameObject.FindGameObjectWithTag ("Player").transform.position = playerPos;
+	}
+
+	public void LoadGame(int minigameNumber) {
+		currentGame = minigameNumber;
+		if (SceneManager.GetActiveScene ().name == "Level2") {
+			SceneManager.LoadScene ("Minigame1");
+		}
+		if (SceneManager.GetActiveScene ().name == "Level3") {
+			SceneManager.LoadScene ("Matching");
 		}
 	}
 }
