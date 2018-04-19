@@ -28,10 +28,12 @@ public class Bullet : MonoBehaviour {
 
 	void OnTriggerEnter2D(Collider2D c) {
 		if (!source || c.gameObject.layer != source.layer && c.tag != "BulletPass") {
-			if (c.gameObject.GetComponent<Player>()) {
-				c.gameObject.GetComponent<Player> ().TakeDamage(damage, transform.right * direction);
-			} else if (c.gameObject.GetComponent<Enemy>()) {
-				c.gameObject.GetComponent<Enemy> ().TakeDamage (damage, transform.right * direction);
+			if (c.gameObject.GetComponent<Player> ()) {
+				c.gameObject.GetComponent<Player> ().TakeDamage (damage, transform.right * direction);
+			} else if (c.gameObject.GetComponent<Enemy> ()) {
+				c.gameObject.GetComponent<Enemy> ().TakeDamage (damage);
+			} else if (c.gameObject.GetComponent<Miniboss> ()) {
+				c.gameObject.GetComponent<Miniboss> ().TakeDamage (damage);
 			}
 			Destroy (this.gameObject);
 		}

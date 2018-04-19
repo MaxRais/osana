@@ -46,19 +46,22 @@ public class GameManager : MonoBehaviour {
 	public int KillsLeft() {
 		return killsLeft;
 	}
+	public int ItemsLeft() {
+		return collected;
+	}
 
 	public void Collect() {
 		collected++;
 		if (collected == goalCollect) {
 			isFinished = true;
-			DisplayMessage.ins.showMessage ("Collection goal reached");
+			DisplayMessage.ins.showMessage ("Task goal reached");
 		}
 	}
 	public void AddKill() {
 		killsLeft--;
 		if (killsLeft > 0) {
 			DisplayMessage.ins.showMessage (string.Concat (killsLeft, " enemies left"), 3);
-		} else if (killsLeft == 0) {
+		} else if (killsLeft == 0 && goalCollect == 0) {
 			isFinished = true;
 			DisplayMessage.ins.showMessage ("Proceed to the exit.", 2);
 		}

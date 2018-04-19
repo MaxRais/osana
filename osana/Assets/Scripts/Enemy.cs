@@ -56,14 +56,14 @@ public class Enemy : MonoBehaviour {
 	
 	// Update is called once per frame
 	protected virtual void Update () {
-		BoxCollider2D col = this.GetComponent<BoxCollider2D> ();
+		Collider2D col = this.GetComponent<Collider2D> ();
 		healthBar.transform.localScale = new Vector3 ((health / maxHealth) , 0.25f, 0.35f);
 		if(shot)
 			shotTimer += Time.deltaTime;
 		if (shotTimer >= shotDelay) {
 			shot = false;
 		}
-		float top = col.offset.y + (col.size.y / 2f);
+		/*float top = col.offset.y + (col.size.y / 2f);
 		float btm = col.offset.y - (col.size.y / 2f);
 		float left = col.offset.x - (col.size.x / 2f);
 		float right = col.offset.x + (col.size.x / 2f); 
@@ -73,7 +73,7 @@ public class Enemy : MonoBehaviour {
 		Vector3 btmLeft = transform.TransformPoint(new Vector3(left, btm, 0f));
 		Vector3 topRight = transform.TransformPoint(new Vector3(right, top, 0f));
 		Vector3 topLeft = transform.TransformPoint(new Vector3(left, top, 0f));
-		/*RaycastHit2D hit = Physics2D.Raycast((direction == 1 ? (snapDown ? btmRight : btmLeft) : (snapDown ? btmLeft : btmRight)) + (transform.up / 2f), -transform.up, 3f, layerMask);
+		RaycastHit2D hit = Physics2D.Raycast((direction == 1 ? (snapDown ? btmRight : btmLeft) : (snapDown ? btmLeft : btmRight)) + (transform.up / 2f), -transform.up, 3f, layerMask);
 		RaycastHit2D hit2 = Physics2D.Raycast ((direction == 1 ? (snapDown ? topRight : topLeft) : (snapDown ? topLeft : topRight)), transform.right * direction, 0.1f, layerMask);
 		RaycastHit2D hit3 = Physics2D.Raycast((direction == 1 ? (snapDown ? btmRight : btmLeft) : (snapDown ? btmLeft : btmRight)) + (transform.up / 2f) , transform.right * direction, 3f, layerMask);
 		Debug.DrawRay ((direction == 1 ? (snapDown ? btmRight : btmLeft) : (snapDown ? btmLeft : btmRight)) + (transform.up / 2f),-transform.up, Color.blue, 1f);*/
@@ -142,7 +142,7 @@ public class Enemy : MonoBehaviour {
 
 	protected virtual void SnapTo(Transform surface, Vector3 pos, Vector3 norm) {
 		//Debug.DrawRay (pos, norm, Color.green, 1f);
-		BoxCollider2D col = this.GetComponent<BoxCollider2D> ();
+		Collider2D col = this.GetComponent<Collider2D> ();
 		//transform.parent = null;
 		platform = surface;
 		Quaternion rotAmt = (Quaternion.FromToRotation (transform.up, norm));
@@ -152,7 +152,7 @@ public class Enemy : MonoBehaviour {
 		snapDown = (norm.y > 0);
 		targetRot = (snapDown ? new Quaternion (0, 0, 0, 0) : new Quaternion (0, 0, 180, 0));
 		//transform.rotation = Quaternion.FromToRotation (transform.up, norm) * transform.rotation;
-		targetPos = pos + norm * col.size.y;
+		targetPos = pos + norm * transform.lossyScale.y;
 		//transform.SetParent (surface);
 	}
 
@@ -226,7 +226,7 @@ public class Enemy : MonoBehaviour {
 		if (hit.collider == null && hit2.collider != null) {
 			SnapTo (hit2.transform, hit2.point, hit2.normal);
 		}
-		if (hit.collider == null || (hit2.collider != null && hit2.collider.tag == "Obstacle") || traveled > range) {
+		if (hit.collider == null || /*(hit2.collider != null && hit2.collider.tag == "Obstacle") ||*/ traveled > range) {
 			traveled = 0;
 			direction *= -1;
 			//rb.velocity = Vector2.zero;
@@ -242,6 +242,9 @@ public class Enemy : MonoBehaviour {
 		else
 			rb.velocity = (targetPos - transform.position) * direction * speed;
 		traveled += Vector3.Magnitude (transform.right * speed * Time.deltaTime * direction);
+
+		RaycastHit2D hit3 = Physics2D.Raycast (this.transform.position, -transform.up, 5, (1 << 9));
+		targetRot = Quaternion.FromToRotation(transform.up, hit.normal);
 		transform.rotation = Quaternion.Lerp (transform.rotation, targetRot, Time.deltaTime * rotSpeed);
 
 	}
@@ -257,7 +260,7 @@ public class Enemy : MonoBehaviour {
 		}
 	}
 
-	public void TakeDamage(int amt, Vector2 dir) {
+	public void TakeDamage(int amt) {
 		Debug.Log (this.name + " taking " + amt + " dmg");
 		this.health -= amt;
 		/*Rigidbody2D rb = this.GetComponent<Rigidbody2D> ();

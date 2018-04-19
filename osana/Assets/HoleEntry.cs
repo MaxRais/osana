@@ -5,13 +5,13 @@ using UnityEngine.SceneManagement;
 
 public class HoleEntry : MonoBehaviour {
 
-	private GameObject posTracker;
 	private PositionTracker pt;
+	public int minigameNumber;
+	private bool created = false;
 
 	// Use this for initialization
 	void Start () {
-		posTracker = GameObject.Find ("PositionTracker");
-		pt = posTracker.GetComponent<PositionTracker> ();
+		pt = GameObject.Find ("PositionTracker").GetComponent<PositionTracker>();
 	}
 	
 	// Update is called once per frame
@@ -19,10 +19,15 @@ public class HoleEntry : MonoBehaviour {
 		
 	}
 
+	public void DisableMinigame() {
+		this.GetComponent<Collider2D> ().enabled = false;
+		this.transform.parent.Find ("Indicator").gameObject.SetActive (false);
+	}
+
 	void OnTriggerEnter2D(Collider2D other) {
 		if (other.tag == "Player") {
-			pt.SetPlayerPos (this.transform);
-			pt.LoadScene ();
+			pt.SetPlayerPos (this.transform.position);
+			pt.LoadGame (minigameNumber);
 		}
 	}
 

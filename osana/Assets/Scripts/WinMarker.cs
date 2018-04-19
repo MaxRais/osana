@@ -18,9 +18,13 @@ public class WinMarker : MonoBehaviour {
 	void OnCollisionEnter2D(Collision2D c) {
 		if (c.gameObject.name == "Player") {
 			if (GameObject.Find ("GameManager").GetComponent<GameManager> ().IsFinished ())
-				SceneManager.LoadScene (SceneManager.GetActiveScene().buildIndex + 1);
-			else
-				DisplayMessage.ins.showMessage ("Not enough kills yet. Kills remaining: " + GameObject.Find ("GameManager").GetComponent<GameManager> ().KillsLeft (), 2);
+				SceneManager.LoadScene (SceneManager.GetActiveScene ().buildIndex + 1);
+			else {
+				if(GameObject.Find ("GameManager").GetComponent<GameManager> ().goalCollect == 0)
+					DisplayMessage.ins.showMessage ("Not enough kills yet. Kills remaining: " + GameObject.Find ("GameManager").GetComponent<GameManager> ().KillsLeft (), 2);
+				else if (GameObject.Find ("GameManager").GetComponent<GameManager> ().goalKills == 0)
+					DisplayMessage.ins.showMessage ("You haven't completed all your tasks. Tasks left: " + GameObject.Find ("GameManager").GetComponent<GameManager> ().ItemsLeft(), 2);
+			}
 		}
 	}
 }
