@@ -37,6 +37,9 @@ public class GameManager : MonoBehaviour {
 			if(currentCheck + 1 < checkpoints.Length)
 				currentCheck++;
 		}
+		if (collected == goalCollect) {
+			isFinished = true;
+		}
 	}
 		
 	public bool IsFinished() {
@@ -51,10 +54,6 @@ public class GameManager : MonoBehaviour {
 
 	public void Collect() {
 		collected++;
-		if (collected == goalCollect) {
-			isFinished = true;
-			DisplayMessage.ins.showMessage ("Task goal reached");
-		}
 	}
 	public void AddKill() {
 		killsLeft--;
