@@ -15,7 +15,7 @@ public class TimerScript : MonoBehaviour {
 	void Start () {
 		endText.enabled = false;
 		text = this.gameObject.GetComponent<Text> ();
-		time = 15f;
+		time = 60f;
 	}
 	
 	// Update is called once per frame
