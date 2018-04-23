@@ -67,7 +67,7 @@ public class PositionTracker : MonoBehaviour {
 			GameObject.Find(minigames [currentGame]).GetComponentInChildren<HoleEntry> ().DisableMinigame ();
 			wonGame = false;
 		}
-		if (playerPos != Vector3.zero && SceneManager.GetActiveScene().name == "Level2" || SceneManager.GetActiveScene().name == "Level3")
+		if (playerPos != Vector3.zero && (SceneManager.GetActiveScene().name == "Level2" || SceneManager.GetActiveScene().name == "Level3"))
 			GameObject.FindGameObjectWithTag ("Player").transform.position = playerPos;
 	}
 
