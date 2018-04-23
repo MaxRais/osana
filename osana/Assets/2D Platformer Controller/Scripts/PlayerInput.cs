@@ -42,8 +42,6 @@ public class PlayerInput : MonoBehaviour
 		{
 			player.SetDirectionalInput (Vector2.zero);
 		}
-		if (Input.GetButtonDown ("Start")) {
-
-		}			
+				
     }
 }
