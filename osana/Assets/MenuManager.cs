@@ -22,6 +22,21 @@ public class MenuManager : MonoBehaviour {
 	public void Level1() {
 		SceneManager.LoadScene ("Level1Reverse");
 	}
+	public void Level2() {
+		SceneManager.LoadScene ("Level2");
+	}
+	public void Level3() {
+		SceneManager.LoadScene ("Level3");
+	}
+	public void Mini1() {
+		SceneManager.LoadScene ("SpeedrunLevel");
+	}
+	public void Mini2() {
+		SceneManager.LoadScene ("Minigame1");
+	}
+	public void Mini3() {
+		SceneManager.LoadScene ("Matching");
+	}
 
 	public void Exit() {
 		Application.Quit ();
