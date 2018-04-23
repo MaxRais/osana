@@ -6,7 +6,7 @@ public class GameManager : MonoBehaviour {
 
 	public int goalKills;
 	public int goalCollect;
-	private int collected;
+	public int collected;
 	private int killsLeft;
 	private bool isFinished;
 	public Transform[] checkpoints;
@@ -18,7 +18,6 @@ public class GameManager : MonoBehaviour {
 	void Start () {
 		killsLeft = goalKills;
 		isFinished = false;
-		collected = 0;
 
 		if (goalKills == 0 && goalCollect == 0)
 			isFinished = true;
@@ -47,7 +46,7 @@ public class GameManager : MonoBehaviour {
 		return killsLeft;
 	}
 	public int ItemsLeft() {
-		return collected;
+		return goalCollect - collected;
 	}
 
 	public void Collect() {

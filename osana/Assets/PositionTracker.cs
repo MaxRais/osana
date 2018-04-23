@@ -8,6 +8,7 @@ public class PositionTracker : MonoBehaviour {
 	private Vector3 playerPos;
 	private static bool created = false;
 	private static bool wonGame = false;
+	private int gamesWon = 0;
 	public string[] minigames;
 	private int currentGame = -1;
 	void Awake() {
@@ -63,7 +64,8 @@ public class PositionTracker : MonoBehaviour {
 
 	void OnSceneLoaded(Scene scene, LoadSceneMode mode) {
 		if (wonGame) {
-			GameObject.Find("GameManager").GetComponent<GameManager> ().Collect ();
+			gamesWon += 1;
+			GameObject.Find ("GameManager").GetComponent<GameManager> ().collected = gamesWon;
 			GameObject.Find(minigames [currentGame]).GetComponentInChildren<HoleEntry> ().DisableMinigame ();
 			wonGame = false;
 		}
