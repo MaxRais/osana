@@ -210,7 +210,7 @@ public class Player : MonoBehaviour
 		this.healthBar.GetComponent<SpriteRenderer> ().enabled = true;
 		if (!dead) {
 			this.health -= amt;
-			ApplyPush (amt, dir);
+			//ApplyPush (amt, dir);
 			StartCoroutine (Blink (amt));
 		}
 	}
