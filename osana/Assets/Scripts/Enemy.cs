@@ -34,6 +34,7 @@ public class Enemy : MonoBehaviour {
 	public float rotSpeed = 2f;
 	private bool rotating = false;
 	private bool climbing = false;
+	private bool alreadyDead = false;
 
 	// Use this for initialization
 	protected virtual void Start () {
@@ -162,8 +163,11 @@ public class Enemy : MonoBehaviour {
 				if (t.name.Contains ("whitebloodcell"))
 					t.GetComponent<FollowPlayer> ().ResetParent ();
 			GameObject manager = GameObject.Find ("GameManager");
-			if(manager)
+
+			if (manager && !alreadyDead) {
 				manager.GetComponent<GameManager> ().AddKill ();
+				alreadyDead = true;
+			}
 			if (dead) {
 				return;
 			}
